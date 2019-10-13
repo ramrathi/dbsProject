@@ -3,8 +3,8 @@
 <head>
   <title>FaceClone</title>
 
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="static/css/style.css">
 </head>
 <body>
   <!-- nav -->
@@ -14,9 +14,9 @@
         <a class="navbar-brand" href="index.html">FaceClone</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="home.html">Home</a></li>
-        <li><a href="profile.html">Profile</a></li>
-        <li><a href="#">Logout</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/myprofile">Profile</a></li>
+        <li><a href="/logout">Logout</a></li>
       </ul>
     </div>
   </nav>
@@ -51,11 +51,11 @@
         <!-- user profile -->
         <div class="media">
           <div class="media-left">
-            <img src="img/my_avatar.png" class="media-object" style="width: 128px; height: 128px;">
+            <img src= {{userdata['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
           </div>
           <div class="media-body">
-            <h2 class="media-heading">nicholaskajoh</h2>
-            <p>Status: I love to code!, Location: Nigeria</p>
+            <h2 class="media-heading">{{userdata["username"]}}</h2>
+            <p>Status: {{userdata['bio']}}</p>
           </div>
         </div>
         <!-- user profile -->
@@ -65,15 +65,17 @@
         <!-- timeline -->
         <div>
           <!-- post -->
-          <div class="panel panel-default">
-            <div class="panel-body">
-              <p>Hello people! This is my first FaceClone post. Hurray!!!</p>
-            </div>
-            <div class="panel-footer">
-              <span>posted 2017-5-27 20:45:01 by nicholaskajoh</span> 
-              <span class="pull-right"><a class="text-danger" href="#">[delete]</a></span>
-            </div>
-          </div>
+          {% for p in userdata["posts"] %}
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <p>{{p[0]}}</p>
+                </div>
+                <div class="panel-footer">
+                  <span>posted {{p[1]}} by you</span> 
+                  <span class="pull-right"><a class="text-danger" href="#">[delete]</a></span>
+                </div>
+              </div>
+          {% endfor %}
           <!-- ./post -->
         </div>
         <!-- ./timeline -->
@@ -104,7 +106,7 @@
     </ul>
   </footer>
   <!-- ./footer -->
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="js/script.js"></script>
+  <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="static/js/script.js"></script>
 </body>
 </html>

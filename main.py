@@ -2,7 +2,6 @@ import os
 import mysql.connector
 from os.path import join, dirname
 from dotenv import load_dotenv
-from flask import request,session,redirect
 from flask import *
 import random
 
@@ -27,6 +26,15 @@ app = Flask(__name__)
 
 app.secret_key = "fuck off"
 
+def getuserdata():
+	userdata = {}
+	userdata['username'] = session['username']
+	userdata['userid'] = session['userid']
+	userdata['bio'] = session['bio']
+	userdata['profile_picture'] = "https://scontent.fbom2-1.fna.fbcdn.net/v/t1.0-1/c0.0.160.160a/p160x160/20800338_1612121165488974_8186128540972407853_n.jpg?_nc_cat=108&_nc_oc=AQnw-asYoiVxRkjzRh1SouPuHhZTJUT6-Mc7jse-PMFsqVGj2D9S1YBzWvZawevztDY&_nc_ht=scontent.fbom2-1.fna&oh=8adb94eb5871b5464e14f1742a56dce4&oe=5E1FD366"
+	return userdata
+
+
 @app.route('/',methods=['GET'])
 def home():
 	if 'logged_in' in session: 
@@ -35,9 +43,10 @@ def home():
 		cursor.execute(sql)
 		posts = cursor.fetchall()
 		posts = posts[::-1]	# Newest posts come first
-		print(posts)	
+		userdata = getuserdata()
+		userdata['posts'] = posts		
 		#-------------------------------------
-		return render_template("./home.html",posts = posts)
+		return render_template("./home.html",userdata = userdata)
 	else :return redirect('/login')
 
 @app.route('/login',methods=['GET','POST'])
@@ -56,7 +65,9 @@ def login():
 			# Set session variables to true
 			session['logged_in'] = True
 			session['userid'] = data[0][0]
-
+			session['username'] = data[0][1]
+			session['dob'] = data[0][3]
+			session['bio'] = data[0][5]
 			return redirect('/')
 	else:
 		if 'logged_in' in session:
@@ -92,11 +103,24 @@ def register():
 
 
 
-@app.route('/account',methods=['GET'])
-def account():
-	return render_template("./profile.html")
+@app.route('/myprofile',methods=['GET'])
+def myprofile():
+	userdata = {}
+	sql = 'select content,time_stamp from Posts where u_id = %s;'%(session['userid'])
+	cursor.execute(sql)
+	posts = cursor.fetchall()
+	posts = posts[::-1]	# Newest posts come first
+	print(posts)
+	userdata = getuserdata()
+	userdata['posts'] = posts	
 
-@app.route('/logout',methods=['POST'])
+	# userdata['username'] = session['username']
+	# userdata['userid'] = session['userid']
+	# userdata['bio'] = session['bio']
+
+	return render_template("./profile.html",userdata = userdata)
+
+@app.route('/logout',methods=['POST','GET'])
 def logout():
 	session.clear()
 	return redirect('/login')
