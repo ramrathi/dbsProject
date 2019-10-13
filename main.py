@@ -16,23 +16,30 @@ mydb = mysql.connector.connect(
 )
 
 cursor = mydb.cursor()
-# sql = "blah blah"
-# cursor.execute(sql)
-# cursor.commit() # if update
-# data = cursor1.fetchall() # if select
-
-from flask import Flask, render_template
 app = Flask(__name__)
-
 app.secret_key = "fuck off"
+
+
+def getfriendsposts(userdata):
+	# Sorry for using cartesian products
+	sql = 'select name,content,time_stamp from Users,Posts where u_id = id and u_id in (select u2_id from Friends where u1_id = %s);'%(session["userid"])
+	cursor.execute(sql)
+	posts = cursor.fetchall()
+	posts = posts[::-1]	# Newest posts come first
+	userdata['posts'] = posts
+
 
 def getuserdata(userdata):
 	userdata['username'] = session['username']
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
+
+	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
 	userdata['profile_picture'] = "https://scontent.fbom2-1.fna.fbcdn.net/v/t1.0-1/c0.0.160.160a/p160x160/20800338_1612121165488974_8186128540972407853_n.jpg?_nc_cat=108&_nc_oc=AQnw-asYoiVxRkjzRh1SouPuHhZTJUT6-Mc7jse-PMFsqVGj2D9S1YBzWvZawevztDY&_nc_ht=scontent.fbom2-1.fna&oh=8adb94eb5871b5464e14f1742a56dce4&oe=5E1FD366"
 
 def getuserfriends(userdata):
+
+	# Overcomplicated query for extra marks ;)
 	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
 	cursor.execute(sql)
 	friends = cursor.fetchall()
@@ -40,6 +47,8 @@ def getuserfriends(userdata):
 	print(friends)
 
 def getallusers(data):
+
+	# Gets users which aren't already friends with current user
 	sql = "select id,name from Users where id not in (select u2_id from Friends where u1_id = %s) and id <> %s;"%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	data["otherusers"] = cursor.fetchall()
@@ -47,20 +56,22 @@ def getallusers(data):
 
 @app.route('/',methods=['GET'])
 def home():
+
+	# If user already logged in 
 	if 'logged_in' in session: 
+
 		# Get all the details to display first and then render
-		sql = 'select name,content,time_stamp from Users,Posts where u_id = id;'
-		cursor.execute(sql)
-		posts = cursor.fetchall()
-		posts = posts[::-1]	# Newest posts come first
 		userdata = {}
 		getuserdata(userdata)
 		getuserfriends(userdata)
 		getallusers(userdata)
-		userdata['posts'] = posts		
-		#-------------------------------------
+		getfriendsposts(userdata)		
+
 		return render_template("./home.html",userdata = userdata)
-	else :return redirect('/login')
+
+	# Not logged in 
+	else :
+		return redirect('/login')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -70,12 +81,15 @@ def login():
 		sql = "select * from Users where email = '%s' and password = '%s';"%(email,password)
 		cursor.execute(sql)
 		data = cursor.fetchall()
-		print(data)
+		
+		# If it can't find an account with matching credentials
 		if len(data)==0:
 			print("Wrong password")
 			return render_template('./index.html',error = "Wrong email or password")
+		
+		# Account found
 		else:
-			# Set session variables to true
+			# Set session variables, have only added a few for now
 			session['logged_in'] = True
 			session['userid'] = data[0][0]
 			session['username'] = data[0][1]
@@ -83,8 +97,10 @@ def login():
 			session['bio'] = data[0][5]
 			return redirect('/')
 	else:
+		# If GET and already logged in, just redirect
 		if 'logged_in' in session:
 			return redirect('/')
+		# If not logged in show login page
 		return render_template("./index.html")
 
 @app.route('/register',methods=['GET','POST'])
@@ -119,6 +135,7 @@ def register():
 @app.route('/myprofile',methods=['GET'])
 def myprofile():
 	userdata = {}
+	# Get posts made by current user
 	sql = 'select content,time_stamp from Posts where u_id = %s;'%(session['userid'])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
@@ -128,16 +145,11 @@ def myprofile():
 	getuserdata(userdata)
 	getuserfriends(userdata)
 	getallusers(userdata)
-	print(userdata)
-
-	# userdata['username'] = session['username']
-	# userdata['userid'] = session['userid']
-	# userdata['bio'] = session['bio']
-
 	return render_template("./profile.html",userdata = userdata)
 
 @app.route('/logout',methods=['POST','GET'])
 def logout():
+	# DESTROYED.
 	session.clear()
 	return redirect('/login')
 
@@ -147,6 +159,7 @@ def post():
 	sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`) VALUES ('%s', '%s', CURTIME());"%(session['userid'],content)
 	cursor.execute(sql)
 	mydb.commit()
+	# Refresh, so that post is seen
 	return redirect("/")
 
 
