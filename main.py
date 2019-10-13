@@ -22,7 +22,7 @@ app.secret_key = "fuck off"
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp from Users,Posts where u_id = id and u_id in (select u2_id from Friends where u1_id = %s);'%(session["userid"])
+	sql = 'select name,content,time_stamp from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
@@ -65,7 +65,8 @@ def home():
 		getuserdata(userdata)
 		getuserfriends(userdata)
 		getallusers(userdata)
-		getfriendsposts(userdata)		
+		getfriendsposts(userdata)	
+		print(userdata["posts"])	
 
 		return render_template("./home.html",userdata = userdata)
 
