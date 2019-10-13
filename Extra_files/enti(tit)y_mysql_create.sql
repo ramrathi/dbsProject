@@ -2,7 +2,7 @@ CREATE TABLE `Users` (
 	`id` INT(10) NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) NOT NULL,
 	`password` varchar(255) NOT NULL,
-	`dob` DATE(255) NOT NULL,
+	`dob` DATE NOT NULL,
 	`gender` INT(1) NOT NULL,
 	`bio` VARCHAR(255),
 	`city` varchar(255),
@@ -15,9 +15,9 @@ CREATE TABLE `Users` (
 
 CREATE TABLE `Posts` (
 	`p_id` INT(10) NOT NULL AUTO_INCREMENT,
-	`u_id` INT(10) NOT NULL AUTO_INCREMENT,
+	`u_id` INT(10) NOT NULL,
 	`content` varchar(500) NOT NULL,
-	`time_stamp` TIMESTAMP(50) NOT NULL,
+	`time_stamp` TIMESTAMP NOT NULL,
 	`photo` blob(1000),
 	`location` varchar(50),
 	`community` INT(10),
@@ -26,18 +26,18 @@ CREATE TABLE `Posts` (
 
 CREATE TABLE `Messages` (
 	`m_id` INT(10) NOT NULL AUTO_INCREMENT,
-	`From` INT(10) NOT NULL AUTO_INCREMENT,
-	`To` INT(10) NOT NULL AUTO_INCREMENT,
+	`From` INT(10) NOT NULL,
+	`To` INT(10) NOT NULL,
 	`Content` varchar(500) NOT NULL,
 	`media` blob(500),
-	`timestamp` TIMESTAMP(500),
+	`timestamp` TIMESTAMP,
 	PRIMARY KEY (`m_id`)
 );
 
 CREATE TABLE `Events` (
 	`e_id` INT(10) NOT NULL AUTO_INCREMENT,
-	`host` INT(10) NOT NULL AUTO_INCREMENT,
-	`location` varchar(50) NOT NULL AUTO_INCREMENT,
+	`host` INT(10) NOT NULL,
+	`location` varchar(50) NOT NULL,
 	`description` varchar(255),
 	`media` blob(255),
 	PRIMARY KEY (`e_id`)
@@ -45,8 +45,8 @@ CREATE TABLE `Events` (
 
 CREATE TABLE `Community` (
 	`c_id` INT(10) NOT NULL AUTO_INCREMENT,
-	`name` varchar(50) NOT NULL AUTO_INCREMENT,
-	`description` varchar(255) AUTO_INCREMENT,
+	`name` varchar(50) NOT NULL,
+	`description` varchar(255),
 	PRIMARY KEY (`c_id`)
 );
 
@@ -75,7 +75,7 @@ CREATE TABLE `Transactions` (
 	`from` INT(10) NOT NULL,
 	`to` INT(10) NOT NULL,
 	`money` INT(10) NOT NULL,
-	`timestamp` TIMESTAMP(10) NOT NULL,
+	`timestamp` TIMESTAMP NOT NULL,
 	`message` varchar(255),
 	PRIMARY KEY (`t_id`)
 );
