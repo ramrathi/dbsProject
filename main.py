@@ -26,13 +26,23 @@ app = Flask(__name__)
 
 app.secret_key = "fuck off"
 
-def getuserdata():
-	userdata = {}
+def getuserdata(userdata):
 	userdata['username'] = session['username']
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
 	userdata['profile_picture'] = "https://scontent.fbom2-1.fna.fbcdn.net/v/t1.0-1/c0.0.160.160a/p160x160/20800338_1612121165488974_8186128540972407853_n.jpg?_nc_cat=108&_nc_oc=AQnw-asYoiVxRkjzRh1SouPuHhZTJUT6-Mc7jse-PMFsqVGj2D9S1YBzWvZawevztDY&_nc_ht=scontent.fbom2-1.fna&oh=8adb94eb5871b5464e14f1742a56dce4&oe=5E1FD366"
-	return userdata
+
+def getuserfriends(userdata):
+	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
+	cursor.execute(sql)
+	friends = cursor.fetchall()
+	userdata['friends'] = friends
+	print(friends)
+
+def getallusers(data):
+	sql = "select id,name from Users where id not in (select u2_id from Friends where u1_id = %s) and id <> %s;"%(session["userid"],session["userid"])
+	cursor.execute(sql)
+	data["otherusers"] = cursor.fetchall()
 
 
 @app.route('/',methods=['GET'])
@@ -43,7 +53,10 @@ def home():
 		cursor.execute(sql)
 		posts = cursor.fetchall()
 		posts = posts[::-1]	# Newest posts come first
-		userdata = getuserdata()
+		userdata = {}
+		getuserdata(userdata)
+		getuserfriends(userdata)
+		getallusers(userdata)
 		userdata['posts'] = posts		
 		#-------------------------------------
 		return render_template("./home.html",userdata = userdata)
@@ -110,9 +123,12 @@ def myprofile():
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
-	print(posts)
-	userdata = getuserdata()
+	userdata={}
 	userdata['posts'] = posts	
+	getuserdata(userdata)
+	getuserfriends(userdata)
+	getallusers(userdata)
+	print(userdata)
 
 	# userdata['username'] = session['username']
 	# userdata['userid'] = session['userid']

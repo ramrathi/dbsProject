@@ -44,11 +44,13 @@
           <div class="panel-body">
             <h4>friend requests</h4>
             <ul>
+              {% for f in userdata['requests'] %}
               <li>
-                <a href="#">johndoe</a> 
+                <a href="#">{{f[1]}}</a> 
                 <a class="text-success" href="#">[accept]</a> 
                 <a class="text-danger" href="#">[decline]</a>
               </li>
+              {% endfor %}
             </ul>
           </div>
         </div>
@@ -91,10 +93,12 @@
           <div class="panel-body">
             <h4>add friend</h4>
             <ul>
+              {% for f in userdata['otherusers'] %}
               <li>
-                <a href="#">alberte</a> 
+                <a href="#">{{f[1]}}</a> 
                 <a href="#">[add]</a>
               </li>
+              {% endfor %}
             </ul>
           </div>
         </div>
@@ -105,10 +109,12 @@
           <div class="panel-body">
             <h4>friends</h4>
             <ul>
+              {% for f in userdata['friends'] %}
               <li>
-                <a href="#">peterpan</a> 
+                <a href="#">{{f[0]}}</a> 
                 <a class="text-danger" href="#">[unfriend]</a>
               </li>
+              {% endfor %}
             </ul>
           </div>
         </div>
