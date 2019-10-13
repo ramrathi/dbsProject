@@ -55,7 +55,7 @@
       </div>
       <div class="col-md-6">
         <!-- post form -->
-        <form method="post" action="">
+        <form method="post" action="post">
           <div class="input-group">
             <input class="form-control" type="text" name="content" placeholder="Make a post...">
             <span class="input-group-btn">
@@ -68,15 +68,18 @@
         <!-- feed -->
         <div>
           <!-- post -->
-          <div class="panel panel-default">
-            <div class="panel-body">
-              <p>Hello people! This is my first FaceClone post. Hurray!!!</p>
-            </div>
-            <div class="panel-footer">
-              <span>posted 2017-5-27 20:45:01 by nicholaskajoh</span> 
-              <span class="pull-right"><a class="text-danger" href="#">[delete]</a></span>
-            </div>
-          </div>
+          
+          {% for p in posts %}
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <p>{{p[1]}}</p>
+                </div>
+                <div class="panel-footer">
+                  <span>posted {{p[2]}} by {{p[0]}}</span> 
+                  <span class="pull-right"><a class="text-danger" href="#">[delete]</a></span>
+                </div>
+              </div>
+          {% endfor %}
           <!-- ./post -->
         </div>
         <!-- ./feed -->
@@ -117,7 +120,6 @@
   <!-- footer -->
   <footer class="container text-center">
     <ul class="nav nav-pills pull-right">
-      <li>FaceClone - Made by [your name here]</li>
     </ul>
   </footer>
   <!-- ./footer -->

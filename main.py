@@ -30,7 +30,14 @@ app.secret_key = "fuck off"
 @app.route('/',methods=['GET'])
 def home():
 	if 'logged_in' in session: 
-		return render_template("./home.html")
+		# Get all the details to display first and then render
+		sql = 'select name,content,time_stamp from Users,Posts where u_id = id;'
+		cursor.execute(sql)
+		posts = cursor.fetchall()
+		posts = posts[::-1]	# Newest posts come first
+		print(posts)	
+		#-------------------------------------
+		return render_template("./home.html",posts = posts)
 	else :return redirect('/login')
 
 @app.route('/login',methods=['GET','POST'])
@@ -48,6 +55,8 @@ def login():
 		else:
 			# Set session variables to true
 			session['logged_in'] = True
+			session['userid'] = data[0][0]
+
 			return redirect('/')
 	else:
 		if 'logged_in' in session:
@@ -91,6 +100,15 @@ def account():
 def logout():
 	session.clear()
 	return redirect('/login')
+
+@app.route('/post',methods=['POST'])
+def post():
+	content = request.form['content']
+	sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`) VALUES ('%s', '%s', CURTIME());"%(session['userid'],content)
+	cursor.execute(sql)
+	mydb.commit()
+	return redirect("/")
+
 
 
 if __name__ == "__main__":
