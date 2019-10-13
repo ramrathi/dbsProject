@@ -4,6 +4,7 @@ from os.path import join, dirname
 from dotenv import load_dotenv
 from flask import request,session,redirect
 from flask import *
+import random
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -53,9 +54,34 @@ def login():
 			return redirect('/')
 		return render_template("./index.html")
 
-@app.route('/register',methods=['GET'])
+@app.route('/register',methods=['GET','POST'])
 def register():
-	return render_template("./register.html")
+	if request.method == "GET":
+		return render_template("./register.html")
+	else:
+		email = request.form['email']
+		username = request.form['username']
+		password = request.form['password']
+		# Eh frontend guy please take the input nicely
+		dob = '1999-05-27'
+		gender = 1
+		# The wallet is being set to random as for some reason wallet is unique? someone change this lmao
+		wallet = random.randrange(0,100000)
+		sql = "select * from Users where email = '%s';"%email
+		cursor.execute(sql)
+		data = cursor.fetchall()
+		if len(data)!=0:
+			return render_template('./register.html',error = "User already exists!")
+		else:
+			# Insert user data here
+
+			print("Adding data")
+			sql = "INSERT INTO `dbsproject`.`Users` (`name`, `password`, `dob`, `gender`, `email`, `wallet`) VALUES ('%s', '%s', '%s', '%s', '%s', '%s');" %(username,password,dob,gender,email,wallet)
+			cursor.execute(sql)
+			mydb.commit()
+			return render_template("./index.html",error = "Account succesfully created!")
+
+
 
 @app.route('/account',methods=['GET'])
 def account():
