@@ -2,6 +2,7 @@ import os
 import mysql.connector
 from os.path import join, dirname
 from dotenv import load_dotenv
+from flask import request,session,redirect
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -10,14 +11,14 @@ mydb = mysql.connector.connect(
   host=os.getenv("localhost"),
   user=os.getenv("user"),
   passwd=os.getenv("passwd"),
-  database=os.getenv("dbsproject")
+  database=os.getenv("database")
 )
 
-cursor1 = mydb.cursor()
-sql = "blah blah"
-cursor1.execute(sql)
-cursor1.commit() # if update
-data = cursor1.fetchall() # if select
+cursor = mydb.cursor()
+# sql = "blah blah"
+# cursor.execute(sql)
+# cursor.commit() # if update
+# data = cursor1.fetchall() # if select
 
 from flask import Flask, render_template
 app = Flask(__name__)
@@ -31,11 +32,11 @@ def login():
 	if request.method == 'POST':
 		email = request.form["email"]
 		password = request.form["password"]
-
-		sql = "select * from users where email = %s and password = %s;"
+		sql = "select * from Users where email = '%s' and password = '%s';"%(email,password)
 		cursor.execute(sql)
 		data = cursor.fetchall()
-		if data == null:
+		print(data)
+		if len(data)==0:
 			return render_template('./index.html',error = "Wrong email or password")
 		else:
 			# Set session variables to true
