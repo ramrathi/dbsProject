@@ -35,7 +35,7 @@ def getuserdata(userdata):
 	userdata['bio'] = session['bio']
 
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
-	userdata['profile_picture'] = "https://scontent.fbom2-1.fna.fbcdn.net/v/t1.0-1/c0.0.160.160a/p160x160/20800338_1612121165488974_8186128540972407853_n.jpg?_nc_cat=108&_nc_oc=AQnw-asYoiVxRkjzRh1SouPuHhZTJUT6-Mc7jse-PMFsqVGj2D9S1YBzWvZawevztDY&_nc_ht=scontent.fbom2-1.fna&oh=8adb94eb5871b5464e14f1742a56dce4&oe=5E1FD366"
+	userdata['profile_picture'] = "http://www.nationalaquatic.com/wp-content/uploads/2012/11/generic-profile-pic.png"
 
 def getuserfriends(userdata):
 
@@ -57,20 +57,20 @@ def getallusers(data):
 @app.route('/',methods=['GET'])
 def home():
 
-	# If user already logged in 
-	if 'logged_in' in session: 
+	# If user already logged in
+	if 'logged_in' in session:
 
 		# Get all the details to display first and then render
 		userdata = {}
 		getuserdata(userdata)
 		getuserfriends(userdata)
 		getallusers(userdata)
-		getfriendsposts(userdata)	
-		print(userdata["posts"])	
+		getfriendsposts(userdata)
+		print(userdata["posts"])
 
 		return render_template("./home.html",userdata = userdata)
 
-	# Not logged in 
+	# Not logged in
 	else :
 		return redirect('/login')
 
@@ -82,12 +82,12 @@ def login():
 		sql = "select * from Users where email = '%s' and password = '%s';"%(email,password)
 		cursor.execute(sql)
 		data = cursor.fetchall()
-		
+
 		# If it can't find an account with matching credentials
 		if len(data)==0:
 			print("Wrong password")
 			return render_template('./index.html',error = "Wrong email or password")
-		
+
 		# Account found
 		else:
 			# Set session variables, have only added a few for now
@@ -142,7 +142,7 @@ def myprofile():
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
 	userdata={}
-	userdata['posts'] = posts	
+	userdata['posts'] = posts
 	getuserdata(userdata)
 	getuserfriends(userdata)
 	getallusers(userdata)

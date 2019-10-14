@@ -1,3 +1,7 @@
+CREATE DATABASE dbsproject;
+
+USE dbsproject;
+
 CREATE TABLE `Users` (
 	`id` INT(10) NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) NOT NULL,
@@ -115,7 +119,7 @@ CREATE TABLE `Belongs` (
 
 CREATE TABLE `Payment` (
 	`user_id` INT(10) NOT NULL,
-	`item_id` INT(10) NOT NULL AUTO_INCREMENT,
+	`item_id` INT(10) NOT NULL,
 	PRIMARY KEY (`user_id`,`item_id`)
 );
 
@@ -158,4 +162,3 @@ ALTER TABLE `Belongs` ADD CONSTRAINT `Belongs_fk1` FOREIGN KEY (`community_id`) 
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_fk0` FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`);
 
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_fk1` FOREIGN KEY (`item_id`) REFERENCES `Market`(`i_id`);
-
