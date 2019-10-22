@@ -19,7 +19,8 @@ cursor = mydb.cursor()
 app = Flask(__name__)
 app.secret_key = "fuck off"
 
-def auth():
+def auth(page):
+	session['url'] = page
 	if 'logged_in' in session: return True
 	else: return False
 
@@ -54,21 +55,29 @@ def getuserfriends(userdata):
 def getallusers(data):
 
 	# Gets users which aren't already friends with current user
-	sql = "select id,name from Users where id not in (select u2_id from Friends where u1_id = %s) and id <> %s;"%(session["userid"],session["userid"])
+	sql = "select id,name from Users where id not in (select u2_id from Friends where u1_id = %s) and id <> %s and id not in (select u_id2 from Requests where u_id1 = %s);"%(session["userid"],session["userid"],session["userid"])
 	cursor.execute(sql)
 	data["otherusers"] = cursor.fetchall()
+
+def getfriendrequests(data):
+
+	# Gets all the friend requests for current user
+	sql = "select u_id1,name from Requests join Users on Users.id = Requests.u_id1 where u_id2 = %s"%(session["userid"])
+	cursor.execute(sql)
+	data["requests"] = cursor.fetchall()
 
 
 @app.route('/',methods=['GET'])
 def home():
 	# If user not logged in
-	if not auth(): return redirect('/login')
+	if not auth("/"): return redirect('/login')
 	# Get all the details to display first and then render
 	userdata = {}
 	getuserdata(userdata)
 	getuserfriends(userdata)
 	getallusers(userdata)
 	getfriendsposts(userdata)
+	getfriendrequests(userdata)
 	# print(userdata["posts"])
 	return render_template("./home.html",userdata = userdata)
 
@@ -133,7 +142,7 @@ def register():
 
 @app.route('/myprofile',methods=['GET'])
 def myprofile():
-	if not auth(): return redirect('/login')
+	if not auth("/myprofile"): return redirect('/login')
 	# Get posts made by current user
 	sql = 'select content,time_stamp from Posts where u_id = %s;'%(session['userid'])
 	cursor.execute(sql)
@@ -171,7 +180,7 @@ def market():
 		# Refresh, so that post is seen
 		return redirect("/market")
 	else:
-		if not auth(): return redirect('/login')
+		if not auth("/market"): return redirect('/login')
 		sql = 'select i_id,title,description,price,Users.name,seller from Market join Users on Users.id = Market.seller where sold = 0'
 		cursor.execute(sql)
 		items = cursor.fetchall()
@@ -205,6 +214,32 @@ def buy(id):
 	mydb.commit()
 	return redirect('/market')
 
+@app.route('/requests/<string:choice>/<string:id>', methods=['GET'])
+def requests(choice,id):
+
+	if choice == "add":
+		sql = "insert into Friends values (%s,%s)"%(id,session['userid'])
+		cursor.execute(sql)
+		sql = "insert into Friends values (%s,%s)"%(session['userid'],id)
+		cursor.execute(sql)
+	sql = "delete from Requests where u_id1 = %s"%(id)
+	cursor.execute(sql)
+	mydb.commit()
+	return redirect(session['url'])
+
+@app.route('/friends/<string:choice>/<string:id>', methods=['GET'])
+def friends(choice,id):
+
+	if choice == "add":
+		sql = "insert into Requests values (%s,%s)"%(session['userid'],id)
+		cursor.execute(sql)
+	else:
+		sql = "delete from Friends where (u1_id = %s and u2_id = %s) or (u1_id = %s and u2_id = %s) "%(id,session['userid'],session['userid'],id)
+		# sql = "delete from Friends where u1_id = %s and u2_id = %s"%(session['userid'],id)
+		cursor.execute(sql)
+		# cursor.execute(sql2)
+	mydb.commit()
+	return redirect(session['url'])
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)

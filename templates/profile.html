@@ -83,14 +83,14 @@
       </div>
       <div class="col-md-3">
         <!-- friends -->
-        <div class="panel panel-default">
+      <div class="panel panel-default">
           <div class="panel-body">
             <h4>Friends</h4>
             <ul>
               {% for f in userdata['friends'] %}
               <li>
                 <a href="#">{{f[0]}}</a>
-                <a class="text-danger" href="#">[unfriend]</a>
+                <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
               </li>
               {% endfor %}
             </ul>
