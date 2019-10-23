@@ -20,11 +20,10 @@ app = Flask(__name__)
 app.secret_key = "fuck off"
 
 def auth(page):
+	# Session url holds the last visited link by the user
 	session['url'] = page
 	if 'logged_in' in session: return True
 	else: return False
-
-
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
@@ -34,12 +33,22 @@ def getfriendsposts(userdata):
 	posts = posts[::-1]	# Newest posts come first
 	userdata['posts'] = posts
 
+def geteventdata(data):
+	sql = "select e_id,host,location,description,media,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
+	sql2 = "select e_id,user_id from (Events join Attending on Events.e_id = Attending.event_id) where user_id in (select u2_id from Friends where u1_id = %s);"%(session['userid'])
+	data['events'] = {}
+	data['event_friends'] = {}
+	cursor.execute(sql)
+	events = cursor.fetchall()
+	cursor.execute(sql2)
+	event_friends = cursor.fetchall()
+	for e in events:
+		data['events'][int(e[0])] = e + tuple([[x[1] for x in event_friends if x[0] == e[0]]]) ;
 
 def getuserdata(userdata):
 	userdata['username'] = session['username']
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
-
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
 	userdata['profile_picture'] = "http://www.nationalaquatic.com/wp-content/uploads/2012/11/generic-profile-pic.png"
 
@@ -216,7 +225,6 @@ def buy(id):
 
 @app.route('/requests/<string:choice>/<string:id>', methods=['GET'])
 def requests(choice,id):
-
 	if choice == "add":
 		sql = "insert into Friends values (%s,%s)"%(id,session['userid'])
 		cursor.execute(sql)
@@ -235,11 +243,20 @@ def friends(choice,id):
 		cursor.execute(sql)
 	else:
 		sql = "delete from Friends where (u1_id = %s and u2_id = %s) or (u1_id = %s and u2_id = %s) "%(id,session['userid'],session['userid'],id)
-		# sql = "delete from Friends where u1_id = %s and u2_id = %s"%(session['userid'],id)
 		cursor.execute(sql)
-		# cursor.execute(sql2)
 	mydb.commit()
 	return redirect(session['url'])
+
+@app.route('/events', methods=['GET'])
+def events():
+	if not auth('/events'): return redirect('/login')
+	data = {}
+	data['userdata'] = {}
+	data['events'] = {}
+	getuserdata(data['userdata'])
+	geteventdata(data)
+	return render_template('./events.html',data = data)
+
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
