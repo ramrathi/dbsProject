@@ -14,6 +14,8 @@
         <a class="navbar-brand" href="/">DBSbook</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
+        <li><a href="/events">Events</a></li>
+        <li><a href="/market">Market</a></li>
         <li><a href="/myprofile">Profile</a></li>
         <li><a href="/logout">Logout</a></li>
       </ul>
@@ -46,8 +48,8 @@
               {% for f in userdata['requests'] %}
               <li>
                 <a href="#">{{f[1]}}</a>
-                <a class="text-success" href="#">[accept]</a>
-                <a class="text-danger" href="#">[decline]</a>
+                <a class="text-success" href="requests/add/{{f[0]}}">[accept]</a>
+                <a class="text-danger" href="requests/delete/{{f[0]}}">[decline]</a>
               </li>
               {% endfor %}
             </ul>
@@ -95,7 +97,7 @@
               {% for f in userdata['otherusers'] %}
               <li>
                 <a href="#">{{f[1]}}</a>
-                <a href="#">[add]</a>
+                <a href="friends/add/{{f[0]}}">[add]</a>
               </li>
               {% endfor %}
             </ul>
@@ -111,7 +113,7 @@
               {% for f in userdata['friends'] %}
               <li>
                 <a href="#">{{f[0]}}</a>
-                <a class="text-danger" href="#">[unfriend]</a>
+                <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
               </li>
               {% endfor %}
             </ul>
