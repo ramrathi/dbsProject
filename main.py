@@ -40,7 +40,7 @@ def refreshcookies():
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
+	sql = 'select name,content,time_stamp,p_id,photosrc from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
@@ -206,8 +206,15 @@ def logout():
 @app.route('/post',methods=['POST'])
 def post():
 	content = request.form['content']
-	sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`) VALUES ('%s', '%s', CURTIME());"%(session['userid'],content)
-	cursor.execute(sql)
+
+	f = request.files['picture']  
+	if f:
+		f.save('static/'+f.filename) 
+		sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`photosrc`) VALUES ('%s', '%s', CURTIME(),'static/%s');"%(session['userid'],content,f.filename)
+		cursor.execute(sql)
+	else:
+		sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`) VALUES ('%s', '%s', CURTIME());"%(session['userid'],content)
+		cursor.execute(sql)
 	mydb.commit()
 	# Refresh, so that post is seen
 	return redirect("/")

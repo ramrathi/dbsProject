@@ -59,9 +59,10 @@
       </div>
       <div class="col-md-6">
         <!-- post form -->
-        <form method="post" action="post">
+        <form method="post" action="post" enctype="multipart/form-data">
           <div class="input-group">
             <input class="form-control" type="text" name="content" placeholder="Make a post...">
+            <input class="form-control" type="file" name="picture"/>
             <span class="input-group-btn">
               <button class="btn btn-success" type="submit" name="post">Post</button>
             </span>
@@ -78,6 +79,11 @@
                 <div class="panel-body">
                   <p>{{p[1]}}</p>
                 </div>
+                {% if p[4] != None %}
+                <div class="panel-body">
+                  <img align = center src = "{{p[4]}}" height="300" width="300">
+                </div>
+                {% endif %}
                 <div class="panel-footer">
                   <span>posted {{p[2]}} by {{p[0]}}</span>
                   <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
