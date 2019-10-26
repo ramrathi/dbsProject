@@ -27,7 +27,7 @@ def auth(page):
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
+	sql = 'select name,content,time_stamp,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
@@ -50,7 +50,7 @@ def getuserdata(userdata):
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
-	userdata['profile_picture'] = "http://www.nationalaquatic.com/wp-content/uploads/2012/11/generic-profile-pic.png"
+	userdata['profile_picture'] = "https://scontent.fbom2-1.fna.fbcdn.net/v/t1.0-9/20800338_1612121165488974_8186128540972407853_n.jpg?_nc_cat=108&_nc_oc=AQks8IhCAON-sQwtUyTMEpE97j13qJsqbKvZOgKQgFcqIgyTsRUoykCZiJOtAZ_9Kpw&_nc_ht=scontent.fbom2-1.fna&oh=21013c69416344515c547a9f9d1f440e&oe=5E25A624"
 
 def getuserfriends(userdata):
 
@@ -81,6 +81,7 @@ def home():
 	# If user not logged in
 	if not auth("/"): return redirect('/login')
 	# Get all the details to display first and then render
+	session['url']='/'
 	userdata = {}
 	getuserdata(userdata)
 	getuserfriends(userdata)
@@ -153,7 +154,7 @@ def register():
 def myprofile():
 	if not auth("/myprofile"): return redirect('/login')
 	# Get posts made by current user
-	sql = 'select content,time_stamp from Posts where u_id = %s;'%(session['userid'])
+	sql = 'select content,time_stamp,p_id from Posts where u_id = %s;'%(session['userid'])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
@@ -257,6 +258,13 @@ def events():
 	geteventdata(data)
 	return render_template('./events.html',data = data)
 
+@app.route('/posts/<string:action>/<string:id>', methods=['GET'])
+def posts(action,id):
+	if action=='delete':
+		sql = 'delete from Posts where p_id = %s'%(id)
+		cursor.execute(sql)
+		mydb.commit()
+		return redirect(session['url'])
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
