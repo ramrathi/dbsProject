@@ -72,6 +72,11 @@
                 <div class="panel-body">
                   <p>{{p[0]}}</p>
                 </div>
+                 {% if p[3] != None %}
+                <div class="panel-body">
+                  <img align = center src = "{{p[3]}}" height="300" width="300">
+                </div>
+                {% endif %}
                 <div class="panel-footer">
                   <span>posted {{p[1]}} by you</span>
                   <span class="pull-right"><a class="text-danger" href="/posts/delete/{{p[2]}}">[delete]</a></span>

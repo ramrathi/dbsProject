@@ -168,7 +168,7 @@ def myprofile():
 	if not auth("/myprofile"): return redirect('/login')
 	if request.method == 'GET':
 		# Get posts made by current user
-		sql = 'select content,time_stamp,p_id from Posts where u_id = %s;'%(session['userid'])
+		sql = 'select content,time_stamp,p_id,photosrc from Posts where u_id = %s;'%(session['userid'])
 		cursor.execute(sql)
 		posts = cursor.fetchall()
 		posts = posts[::-1]	# Newest posts come first
