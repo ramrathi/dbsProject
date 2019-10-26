@@ -25,6 +25,19 @@ def auth(page):
 	if 'logged_in' in session: return True
 	else: return False
 
+def refreshcookies():
+	sql = "select * from Users where id = '%s';"%(session['userid'])
+	cursor.execute(sql)
+	data = cursor.fetchall()
+	session.clear()
+	session['logged_in'] = True
+	session['userid'] = data[0][0]
+	session['username'] = data[0][1]
+	session['dob'] = data[0][3]
+	session['bio'] = data[0][5]
+	session['picture'] = data[0][11]
+
+
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
 	sql = 'select name,content,time_stamp,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
@@ -50,10 +63,9 @@ def getuserdata(userdata):
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
-	userdata['profile_picture'] = "https://scontent.fbom2-1.fna.fbcdn.net/v/t1.0-9/20800338_1612121165488974_8186128540972407853_n.jpg?_nc_cat=108&_nc_oc=AQks8IhCAON-sQwtUyTMEpE97j13qJsqbKvZOgKQgFcqIgyTsRUoykCZiJOtAZ_9Kpw&_nc_ht=scontent.fbom2-1.fna&oh=21013c69416344515c547a9f9d1f440e&oe=5E25A624"
+	userdata['profile_picture'] = session['picture']
 
 def getuserfriends(userdata):
-
 	# Overcomplicated query for extra marks ;)
 	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
 	cursor.execute(sql)
@@ -113,6 +125,7 @@ def login():
 			session['username'] = data[0][1]
 			session['dob'] = data[0][3]
 			session['bio'] = data[0][5]
+			session['picture'] = data[0][11]
 			return redirect('/')
 	else:
 		# If GET and already logged in, just redirect
@@ -150,20 +163,39 @@ def register():
 
 
 
-@app.route('/myprofile',methods=['GET'])
+@app.route('/myprofile',methods=['GET','POST'])
 def myprofile():
 	if not auth("/myprofile"): return redirect('/login')
-	# Get posts made by current user
-	sql = 'select content,time_stamp,p_id from Posts where u_id = %s;'%(session['userid'])
-	cursor.execute(sql)
-	posts = cursor.fetchall()
-	posts = posts[::-1]	# Newest posts come first
-	userdata={}
-	userdata['posts'] = posts
-	getuserdata(userdata)
-	getuserfriends(userdata)
-	getallusers(userdata)
-	return render_template("./profile.html",userdata = userdata)
+	if request.method == 'GET':
+		# Get posts made by current user
+		sql = 'select content,time_stamp,p_id from Posts where u_id = %s;'%(session['userid'])
+		cursor.execute(sql)
+		posts = cursor.fetchall()
+		posts = posts[::-1]	# Newest posts come first
+		userdata={}
+		userdata['posts'] = posts
+		getuserdata(userdata)
+		getuserfriends(userdata)
+		getallusers(userdata)
+		return render_template("./profile.html",userdata = userdata)
+	else:
+		status = request.form['status']
+		picture = request.form['picture']
+		if status:
+			sql = "update Users set bio = '%s' where id = %s"%(status,session['userid'])
+			print(sql)
+			session['status'] = status
+			cursor.execute(sql)
+		if picture:
+			sql = "update Users set picture = '%s' where id = %s"%(picture,session['userid'])
+			print(sql)
+			session['status'] = status
+			cursor.execute(sql)
+				
+		mydb.commit()
+		refreshcookies()
+		return redirect('/myprofile')
+
 
 @app.route('/logout',methods=['POST','GET'])
 def logout():
