@@ -1,1 +1,143 @@
-<h1>Fuck off</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DBSbook</title>
+
+  <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="static/css/style.css">
+</head>
+<body>
+  <!-- nav -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">DBSbook</a>
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/transaction">Payments</a></li>
+        <li><a href="/community">Communities</a></li>
+        <li><a href="/music">Music</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/myprofile">Profile</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+  <!-- ./nav -->
+
+  <!-- main -->
+  <main class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <!-- edit profile -->
+<!--         <div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Edit profile</h4>
+            <form method="post" action="">
+              <div class="form-group">
+                <input class="form-control" type="text" name="status" placeholder="Status" value="">
+              </div>
+
+              <div class="form-group">
+                <input class="form-control" type="text" name="location" placeholder="Location" value="">
+              </div>
+
+              <div class="form-group">
+                <input class="btn btn-primary" type="submit" name="update_profile" value="Save">
+              </div>
+            </form>
+          </div>
+        </div> -->
+        <!-- ./edit profile -->
+      </div>
+
+      <div class="col-md-6">
+      	<h1 align="center">Events</h1>
+        <!-- user profile -->
+       <!--  <div class="media">
+          <div class="media-left">
+            <img src= {{data['userdata']['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
+          </div>
+          <div class="media-body">
+            <h2 class="media-heading">{{data['userdata']["username"]}}</h2>
+            <p>Status: {{data['userdata']['bio']}}</p>
+          </div>
+        </div> -->
+        <!-- user profile -->
+        <hr>
+        <!-- timeline -->
+        
+
+
+        <div>
+        <!-- post form -->
+        <form method="post" action="post" enctype="multipart/form-data">
+          <div class="input-group">
+            <input class="form-control" type="text" name="title" placeholder="Title">
+            <input class="form-control" type="text" name="description" placeholder="Description...">
+            <input class="form-control" type="text" name="location" placeholder="Location">
+            <span class="input-group-btn">
+              <button class="btn btn-success" type="submit" name="post">Post</button>
+            </span>
+          </div>
+        </form><hr>
+          <!-- Events -->
+          {% for p in data["events"]['events'] %}
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <h3>{{data["events"]["events"][p][3]}}</h3>
+                  <p>{{data["events"]["events"][p][2]}}</p>
+                  {% if data['events']['events'][p][4] != None %}
+                    <img src = "{{data['events']['events'][p][4]}}" height="300" width="300">
+                  {% endif %}
+                </div>
+                <div class="panel-footer">
+                  <span>Total going: {{data["events"]["events"][p][5]}}</span><br>
+                  <span>Friends going: {{data["events"]["events"][p][6]|length}}</span>
+
+                  {% if p[5] == data['userdata']['userid'] %}
+                  	<span class="pull-right"><a href="marksold/{{p[0]}}">{{'[Mark as sold]'}}</a></span>
+
+                  	{% else %}
+                  	<span class="pull-right"><a href="Attend/{{data["events"]["events"][p][0]}}">{{'[Attend]'}}</a></span>
+                  {% endif %}
+                </div>
+              </div>
+          {% endfor %}
+          <!-- ./Events -->
+        </div>
+        <!-- ./timeline -->
+      </div>
+      <div class="col-md-3">
+        <!-- friends -->
+       <!--  <div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Friends</h4>
+            <ul>
+              {% for f in data['userdata']['friends'] %}
+              <li>
+                <a href="#">{{f[0]}}</a>
+                <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div> -->
+        <!-- ./friends -->
+      </div>
+    </div>
+  </main>
+  <!-- ./main -->
+
+  <!-- footer -->
+  <footer class="container text-center">
+    <ul class="nav nav-pills pull-right">
+      <!-- <li>DBSbook - Made by [your name here]</li> -->
+    </ul>
+  </footer>
+  <!-- ./footer -->
+  <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="static/js/script.js"></script>
+</body>
+</html>

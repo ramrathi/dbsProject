@@ -47,7 +47,7 @@ def getfriendsposts(userdata):
 	userdata['posts'] = posts
 
 def geteventdata(data):
-	sql = "select e_id,host,location,description,media,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
+	sql = "select e_id,host,location,description,mediasrc,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
 	sql2 = "select e_id,user_id from (Events join Attending on Events.e_id = Attending.event_id) where user_id in (select u2_id from Friends where u1_id = %s);"%(session['userid'])
 	data['events'] = {}
 	data['event_friends'] = {}
@@ -287,16 +287,6 @@ def friends(choice,id):
 	mydb.commit()
 	return redirect(session['url'])
 
-@app.route('/events', methods=['GET'])
-def events():
-	if not auth('/events'): return redirect('/login')
-	data = {}
-	data['userdata'] = {}
-	data['events'] = {}
-	getuserdata(data['userdata'])
-	geteventdata(data)
-	return render_template('./events.html',data = data)
-
 @app.route('/posts/<string:action>/<string:id>', methods=['GET'])
 def posts(action,id):
 	if action=='delete':
@@ -304,6 +294,19 @@ def posts(action,id):
 		cursor.execute(sql)
 		mydb.commit()
 		return redirect(session['url'])
+
+@app.route('/events', methods=['GET'])
+def events():
+	if request.method == 'GET':
+		if not auth('/events'): return redirect('/login')
+		data = {}
+		data['events'] = {}
+		data['userdata'] = {}
+		geteventdata(data['events'])
+		getuserdata(data['userdata'])
+		return render_template("./events.html",data = data)
+
+
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
