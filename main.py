@@ -40,11 +40,16 @@ def refreshcookies():
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp,p_id,photosrc from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
+	sql = 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
 	userdata['posts'] = posts
+	sql = 'select comm_id,post_id, name,content,timestamp from Comments join Users on Users.id = Comments.user_id'
+	cursor.execute(sql)
+	comments = cursor.fetchall()
+	userdata['comments'] = comments
+
 
 def geteventdata(data):
 	sql = "select e_id,host,location,description,mediasrc,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
@@ -305,6 +310,23 @@ def events():
 		geteventdata(data['events'])
 		getuserdata(data['userdata'])
 		return render_template("./events.html",data = data)
+
+@app.route('/comment/<string:action>/<string:id>', methods=['POST','GET'])
+def comment(action,id):
+	if request.method == 'POST':
+		comment_content = request.form['content']
+		sql = "insert into Comments values (NULL,'%s','%s','%s',NULL)"%(id,session['userid'],comment_content)
+		cursor.execute(sql)
+		mydb.commit()
+		return redirect('/')
+	else:
+		sql = "delete from Comments where comm_id = %s"%(id)
+		cursor.execute(sql)
+		mydb.commit()
+		return redirect('/')
+
+
+
 
 
 

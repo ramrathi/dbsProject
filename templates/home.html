@@ -78,6 +78,7 @@
           <!-- post -->
 
           {% for p in userdata['posts'] %}
+              <form method="post" action="comment/add/{{p[5]}}">
               <div class="panel panel-default">
                 <div class="panel-footer">
                   <span>posted {{p[2]}} by {{p[0]}}</span>
@@ -89,12 +90,24 @@
                   <img align = center src = "{{p[4]}}" height="300" width="300">
                 {% endif %}
                 </div>
-                {# <!-- {% for c in userdata['comments'][p[0]] %}
-                <div class="panel-ffooter">
-                  <span>{{c[1]}}</span>
-                  <span class="pull-right"><a class="text-danger" href="comments/delete/{{p[3]}}">[delete]</a></span>
+                <div class="panel-footer">
+			          <div class="input-group">
+			            <input class="form-control" type="text" name="content" placeholder="Add a comment...">
+			            <span class="input-group-btn">
+			              <button class="btn btn-success" type="submit" name="comment">Comment</button>
+			            </span>
+			          </div>
+			        </form>
                 </div>
-                {% endfor %} --> #}
+                {% for c in userdata['comments'] %}
+                {% if c[1] == p[5] %}
+                <div class="panel-footer">
+                  <span>{{c[3]}}</span>
+                  <span class="pull-right"><a class="text-danger" href="comment/delete/{{c[0]}}">[delete]</a></span>
+                  <span class="pull-right"><b>{{c[2]}}</b></span>
+                </div>
+                {% endif %}
+                {% endfor %}
               </div>
           {% endfor %}
           <!-- ./post -->
