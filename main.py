@@ -70,6 +70,13 @@ def getuserdata(userdata):
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
 	userdata['profile_picture'] = session['picture']
 
+def getwalletdata(userdata):
+	sql = "select wallet from Users where id = %s"%(session['userid'])
+	cursor.execute(sql)
+	wallet = cursor.fetchall()
+	print(wallet[0][0])
+	userdata['wallet'] = wallet[0]
+
 def getuserfriends(userdata):
 	# Overcomplicated query for extra marks ;)
 	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
@@ -325,6 +332,15 @@ def comment(action,id):
 		mydb.commit()
 		return redirect('/')
 
+
+@app.route('/transaction', methods=['POST','GET'])
+def transaction():
+	if request.method == 'GET':
+		if not auth("/transaction"): return redirect('/login')
+		userdata = {}
+		getwalletdata(userdata)
+		getuserdata(userdata)
+		return render_template('./transaction.html',userdata=userdata)
 
 
 

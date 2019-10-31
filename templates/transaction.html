@@ -33,6 +33,7 @@
         <!-- profile brief -->
          <div class="media">
           <div class="media-left">
+            <br><br><br>
             <img src= {{userdata['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
           </div>
           <div class="media-body">
@@ -46,12 +47,15 @@
       </div>
       <div class="col-md-6">
         <!-- post form -->
+          <img src= '/static/img/wallet.png' align = 'center' style="width: 180px; height: 180px;">
+          <img src= '/static/img/wallet.png' align = 'center' style="width: 180px; height: 180px;">
+          <img src= '/static/img/wallet.png' align = 'center' style="width: 180px; height: 180px;">
+          <hr>
         <form method="post" action="post" enctype="multipart/form-data">
           <div class="input-group">
-            <input class="form-control" type="text" name="content" placeholder="Make a post...">
-            <input class="form-control" type="file" name="picture"/>
+            <input class="form-control" type="text" name="content" placeholder="Send Money">
             <span class="input-group-btn">
-              <button class="btn btn-success" type="submit" name="post">Post</button>
+              <button class="btn btn-success" type="submit" name="money">Send</button>
             </span>
           </div>
         </form><hr>
@@ -62,6 +66,24 @@
      
 
       
+      </div>
+       <div class="col-md-3">
+      <!-- add friend -->
+            <br><br><br>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Transaction History</h4>
+            <ul>
+              {% for f in userdata['transactions'] %}
+              <li>
+                <a href="#">{{f[1]}}</a>
+                <a href="friends/add/{{f[0]}}">[add]</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <!-- ./add friend -->
       </div>
     </div>
   </main>
