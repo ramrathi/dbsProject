@@ -79,16 +79,22 @@
 
           {% for p in userdata['posts'] %}
               <div class="panel panel-default">
+                <div class="panel-footer">
+                  <span>posted {{p[2]}} by {{p[0]}}</span>
+                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
+                </div>
                 <div class="panel-body">
                   <p>{{p[1]}}</p>
                 {% if p[4] != None %}
                   <img align = center src = "{{p[4]}}" height="300" width="300">
                 {% endif %}
                 </div>
-                <div class="panel-footer">
-                  <span>posted {{p[2]}} by {{p[0]}}</span>
-                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
+                {# <!-- {% for c in userdata['comments'][p[0]] %}
+                <div class="panel-ffooter">
+                  <span>{{c[1]}}</span>
+                  <span class="pull-right"><a class="text-danger" href="comments/delete/{{p[3]}}">[delete]</a></span>
                 </div>
+                {% endfor %} --> #}
               </div>
           {% endfor %}
           <!-- ./post -->
