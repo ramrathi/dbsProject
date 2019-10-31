@@ -25,16 +25,29 @@ def auth(page):
 	if 'logged_in' in session: return True
 	else: return False
 
+def refreshcookies():
+	sql = "select * from Users where id = '%s';"%(session['userid'])
+	cursor.execute(sql)
+	data = cursor.fetchall()
+	session.clear()
+	session['logged_in'] = True
+	session['userid'] = data[0][0]
+	session['username'] = data[0][1]
+	session['dob'] = data[0][3]
+	session['bio'] = data[0][5]
+	session['picture'] = data[0][11]
+
+
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
+	sql = 'select name,content,time_stamp,p_id,photosrc from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
 	userdata['posts'] = posts
 
 def geteventdata(data):
-	sql = "select e_id,host,location,description,media,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
+	sql = "select e_id,host,location,description,mediasrc,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
 	sql2 = "select e_id,user_id from (Events join Attending on Events.e_id = Attending.event_id) where user_id in (select u2_id from Friends where u1_id = %s);"%(session['userid'])
 	data['events'] = {}
 	data['event_friends'] = {}
@@ -50,10 +63,9 @@ def getuserdata(userdata):
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
-	userdata['profile_picture'] = "http://www.nationalaquatic.com/wp-content/uploads/2012/11/generic-profile-pic.png"
+	userdata['profile_picture'] = session['picture']
 
 def getuserfriends(userdata):
-
 	# Overcomplicated query for extra marks ;)
 	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
 	cursor.execute(sql)
@@ -81,6 +93,7 @@ def home():
 	# If user not logged in
 	if not auth("/"): return redirect('/login')
 	# Get all the details to display first and then render
+	session['url']='/'
 	userdata = {}
 	getuserdata(userdata)
 	getuserfriends(userdata)
@@ -112,6 +125,7 @@ def login():
 			session['username'] = data[0][1]
 			session['dob'] = data[0][3]
 			session['bio'] = data[0][5]
+			session['picture'] = data[0][11]
 			return redirect('/')
 	else:
 		# If GET and already logged in, just redirect
@@ -149,20 +163,39 @@ def register():
 
 
 
-@app.route('/myprofile',methods=['GET'])
+@app.route('/myprofile',methods=['GET','POST'])
 def myprofile():
 	if not auth("/myprofile"): return redirect('/login')
-	# Get posts made by current user
-	sql = 'select content,time_stamp from Posts where u_id = %s;'%(session['userid'])
-	cursor.execute(sql)
-	posts = cursor.fetchall()
-	posts = posts[::-1]	# Newest posts come first
-	userdata={}
-	userdata['posts'] = posts
-	getuserdata(userdata)
-	getuserfriends(userdata)
-	getallusers(userdata)
-	return render_template("./profile.html",userdata = userdata)
+	if request.method == 'GET':
+		# Get posts made by current user
+		sql = 'select content,time_stamp,p_id,photosrc from Posts where u_id = %s;'%(session['userid'])
+		cursor.execute(sql)
+		posts = cursor.fetchall()
+		posts = posts[::-1]	# Newest posts come first
+		userdata={}
+		userdata['posts'] = posts
+		getuserdata(userdata)
+		getuserfriends(userdata)
+		getallusers(userdata)
+		return render_template("./profile.html",userdata = userdata)
+	else:
+		status = request.form['status']
+		picture = request.form['picture']
+		if status:
+			sql = "update Users set bio = '%s' where id = %s"%(status,session['userid'])
+			print(sql)
+			session['status'] = status
+			cursor.execute(sql)
+		if picture:
+			sql = "update Users set picture = '%s' where id = %s"%(picture,session['userid'])
+			print(sql)
+			session['status'] = status
+			cursor.execute(sql)
+				
+		mydb.commit()
+		refreshcookies()
+		return redirect('/myprofile')
+
 
 @app.route('/logout',methods=['POST','GET'])
 def logout():
@@ -173,8 +206,15 @@ def logout():
 @app.route('/post',methods=['POST'])
 def post():
 	content = request.form['content']
-	sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`) VALUES ('%s', '%s', CURTIME());"%(session['userid'],content)
-	cursor.execute(sql)
+
+	f = request.files['picture']  
+	if f:
+		f.save('static/'+f.filename) 
+		sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`photosrc`) VALUES ('%s', '%s', CURTIME(),'static/%s');"%(session['userid'],content,f.filename)
+		cursor.execute(sql)
+	else:
+		sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`) VALUES ('%s', '%s', CURTIME());"%(session['userid'],content)
+		cursor.execute(sql)
 	mydb.commit()
 	# Refresh, so that post is seen
 	return redirect("/")
@@ -247,15 +287,25 @@ def friends(choice,id):
 	mydb.commit()
 	return redirect(session['url'])
 
+@app.route('/posts/<string:action>/<string:id>', methods=['GET'])
+def posts(action,id):
+	if action=='delete':
+		sql = 'delete from Posts where p_id = %s'%(id)
+		cursor.execute(sql)
+		mydb.commit()
+		return redirect(session['url'])
+
 @app.route('/events', methods=['GET'])
 def events():
-	if not auth('/events'): return redirect('/login')
-	data = {}
-	data['userdata'] = {}
-	data['events'] = {}
-	getuserdata(data['userdata'])
-	geteventdata(data)
-	return render_template('./events.html',data = data)
+	if request.method == 'GET':
+		if not auth('/events'): return redirect('/login')
+		data = {}
+		data['events'] = {}
+		data['userdata'] = {}
+		geteventdata(data['events'])
+		getuserdata(data['userdata'])
+		return render_template("./events.html",data = data)
+
 
 
 if __name__ == "__main__":

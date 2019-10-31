@@ -51,8 +51,9 @@
         </div> -->
         <!-- ./edit profile -->
       </div>
+
       <div class="col-md-6">
-      	<h1 align="center"> MARKETPLACE</h1>
+      	<h1 align="center">Events</h1>
         <!-- user profile -->
        <!--  <div class="media">
           <div class="media-left">
@@ -64,39 +65,53 @@
           </div>
         </div> -->
         <!-- user profile -->
-
         <hr>
-
         <!-- timeline -->
+        
+
+
         <div>
-          <!-- Items -->
-          {% for p in data["items"] %}
+        <!-- post form -->
+        <form method="post" action="post" enctype="multipart/form-data">
+          <div class="input-group">
+            <input class="form-control" type="text" name="title" placeholder="Title">
+            <input class="form-control" type="text" name="description" placeholder="Description...">
+            <input class="form-control" type="text" name="location" placeholder="Location">
+            <span class="input-group-btn">
+              <button class="btn btn-success" type="submit" name="post">Post</button>
+            </span>
+          </div>
+        </form><hr>
+          <!-- Events -->
+          {% for p in data["events"]['events'] %}
               <div class="panel panel-default">
                 <div class="panel-body">
-                  <h3>{{p[1]}}</h3>
-                  <p>{{p[2]}}</p>
-                  <b><p>Price: {{p[3]}}</p></b>
+                  <h3>{{data["events"]["events"][p][3]}}</h3>
+                  <p>{{data["events"]["events"][p][2]}}</p>
+                  {% if data['events']['events'][p][4] != None %}
+                    <img src = "{{data['events']['events'][p][4]}}" height="300" width="300">
+                  {% endif %}
                 </div>
                 <div class="panel-footer">
-                  <span>posted by {{p[4]}}</span>
+                  <span>Total going: {{data["events"]["events"][p][5]}}</span><br>
+                  <span>Friends going: {{data["events"]["events"][p][6]|length}}</span>
+
                   {% if p[5] == data['userdata']['userid'] %}
                   	<span class="pull-right"><a href="marksold/{{p[0]}}">{{'[Mark as sold]'}}</a></span>
 
                   	{% else %}
-                  	<span class="pull-right"><a href="buy/{{p[0]}}">{{'[BUY]'}}</a></span>
-
-
+                  	<span class="pull-right"><a href="Attend/{{data["events"]["events"][p][0]}}">{{'[Attend]'}}</a></span>
                   {% endif %}
                 </div>
               </div>
           {% endfor %}
-          <!-- ./Items -->
+          <!-- ./Events -->
         </div>
         <!-- ./timeline -->
       </div>
       <div class="col-md-3">
         <!-- friends -->
-        <div class="panel panel-default">
+       <!--  <div class="panel panel-default">
           <div class="panel-body">
             <h4>Friends</h4>
             <ul>
@@ -108,7 +123,7 @@
               {% endfor %}
             </ul>
           </div>
-        </div>
+        </div> -->
         <!-- ./friends -->
       </div>
     </div>

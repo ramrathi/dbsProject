@@ -14,7 +14,9 @@
         <a class="navbar-brand" href="/">DBSbook</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
-        <!-- <li><a href="/">Home</a></li> -->
+        <li><a href="/transaction">Payments</a></li>
+        <li><a href="/community">Communities</a></li>
+        <li><a href="/music">Music</a></li>
         <li><a href="/events">Events</a></li>
         <li><a href="/market">Market</a></li>
         <li><a href="/myprofile">Profile</a></li>
@@ -32,13 +34,13 @@
         <div class="panel panel-default">
           <div class="panel-body">
             <h4>Edit profile</h4>
-            <form method="post" action="">
+            <form method="post" action="/myprofile">
               <div class="form-group">
                 <input class="form-control" type="text" name="status" placeholder="Status" value="">
               </div>
 
               <div class="form-group">
-                <input class="form-control" type="text" name="location" placeholder="Location" value="">
+                <input class="form-control" type="text" name="picture" placeholder="Picture URL" value="">
               </div>
 
               <div class="form-group">
@@ -71,10 +73,13 @@
               <div class="panel panel-default">
                 <div class="panel-body">
                   <p>{{p[0]}}</p>
+                 {% if p[3] != None %}
+                  <img align = center src = "{{p[3]}}" height="300" width="300">
+                {% endif %}
                 </div>
                 <div class="panel-footer">
                   <span>posted {{p[1]}} by you</span>
-                  <span class="pull-right"><a class="text-danger" href="#">[delete]</a></span>
+                  <span class="pull-right"><a class="text-danger" href="/posts/delete/{{p[2]}}">[delete]</a></span>
                 </div>
               </div>
           {% endfor %}

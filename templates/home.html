@@ -14,6 +14,9 @@
         <a class="navbar-brand" href="/">DBSbook</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
+        <li><a href="/transaction">Payments</a></li>
+        <li><a href="/community">Communities</a></li>
+        <li><a href="/music">Music</a></li>
         <li><a href="/events">Events</a></li>
         <li><a href="/market">Market</a></li>
         <li><a href="/myprofile">Profile</a></li>
@@ -59,9 +62,10 @@
       </div>
       <div class="col-md-6">
         <!-- post form -->
-        <form method="post" action="post">
+        <form method="post" action="post" enctype="multipart/form-data">
           <div class="input-group">
             <input class="form-control" type="text" name="content" placeholder="Make a post...">
+            <input class="form-control" type="file" name="picture"/>
             <span class="input-group-btn">
               <button class="btn btn-success" type="submit" name="post">Post</button>
             </span>
@@ -77,10 +81,13 @@
               <div class="panel panel-default">
                 <div class="panel-body">
                   <p>{{p[1]}}</p>
+                {% if p[4] != None %}
+                  <img align = center src = "{{p[4]}}" height="300" width="300">
+                {% endif %}
                 </div>
                 <div class="panel-footer">
                   <span>posted {{p[2]}} by {{p[0]}}</span>
-                  <span class="pull-right"><a class="text-danger" href="#">[delete]</a></span>
+                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
                 </div>
               </div>
           {% endfor %}
