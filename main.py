@@ -37,6 +37,17 @@ def refreshcookies():
 	session['bio'] = data[0][5]
 	session['picture'] = data[0][11]
 
+def getcommunity(comm,id):
+	sql = "select * from Community where c_id = "+id
+	cursor.execute(sql)
+	c = cursor.fetchall()
+	comm['id'] = c[0][0]
+	comm['name'] = c[0][1]
+	comm['description'] = c[0][2]
+	print("*********")
+	print(c)
+	print("*********")
+
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
@@ -50,6 +61,16 @@ def getfriendsposts(userdata):
 	comments = cursor.fetchall()
 	userdata['comments'] = comments
 
+def getcommunityposts(userdata,id):
+	sql = 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where community = %s and u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(id,session["userid"],session["userid"])
+	cursor.execute(sql)
+	posts = cursor.fetchall()
+	posts = posts[::-1]	# Newest posts come first
+	userdata['posts'] = posts
+	sql = 'select comm_id,post_id, name,content,timestamp from Comments join Users on Users.id = Comments.user_id'
+	cursor.execute(sql)
+	comments = cursor.fetchall()
+	userdata['comments'] = comments
 
 def geteventdata(data):
 	sql = "select e_id,host,location,description,mediasrc,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
@@ -71,16 +92,16 @@ def getuserdata(userdata):
 	userdata['profile_picture'] = session['picture']
 
 def getfrienddata(userdata):
-    sql = "select name from Users where id=%s;"%(session['fid'])
-    sql2 = "select bio from Users where id=%s;"%(session['fid'])
-    sql3 = "select picture from Users where id=%s;"%(session['fid'])
-    cursor.execute(sql)
-    userdata['friendname'] = cursor.fetchone()[0]
-    cursor.execute(sql2)
-    userdata['fbio'] = cursor.fetchall()[0][0]
-    cursor.execute(sql3)
-    userdata['fprofile_picture'] = cursor.fetchall()[0][0]
-    print(userdata['fprofile_picture'])
+	sql = "select name from Users where id=%s;"%(session['fid'])
+	sql2 = "select bio from Users where id=%s;"%(session['fid'])
+	sql3 = "select picture from Users where id=%s;"%(session['fid'])
+	cursor.execute(sql)
+	userdata['friendname'] = cursor.fetchone()[0]
+	cursor.execute(sql2)
+	userdata['fbio'] = cursor.fetchall()[0][0]
+	cursor.execute(sql3)
+	userdata['fprofile_picture'] = cursor.fetchall()[0][0]
+	print(userdata['fprofile_picture'])
 
 def getwalletdata(userdata):
 	sql = "select wallet from Users where id = %s"%(session['userid'])
@@ -112,26 +133,25 @@ def getfriendrequests(data):
 	data["requests"] = cursor.fetchall()
 
 def getmessages(messages):
-    sql = "select M.*,Users.name from Users join (select m.m_id,m.From,m.Content,m.media,m.timestamp from Messages m where m.m_id in(select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s UNION select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s)) as M on M.From = Users.id;"%(session["userid"],session["fid"],session["fid"],session["userid"])
-    cursor.execute(sql)
-    messages['texts'] = cursor.fetchall()
-    messages['users'] = []
-    for i in messages['texts']:
-        print("id=")
-        print(i[1])
-        sql2 = "select name from Users where id=%s;"%(i[1])
-        cursor.execute(sql2)
-        n = cursor.fetchall()[0][0]
-        messages['users'].append(n)
-    print(messages['users'])
-    print(messages['texts'])
+	sql = "select M.*,Users.name from Users join (select m.m_id,m.From,m.Content,m.media,m.timestamp from Messages m where m.m_id in(select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s UNION select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s)) as M on M.From = Users.id;"%(session["userid"],session["fid"],session["fid"],session["userid"])
+	cursor.execute(sql)
+	messages['texts'] = cursor.fetchall()
+	messages['users'] = []
+	for i in messages['texts']:
+		print("id=")
+		print(i[1])
+		sql2 = "select name from Users where id=%s;"%(i[1])
+		cursor.execute(sql2)
+		n = cursor.fetchall()[0][0]
+		messages['users'].append(n)
+	print(messages['users'])
+	print(messages['texts'])
 
 @app.route('/',methods=['GET'])
 def home():
 	# If user not logged in
 	if not auth("/"): return redirect('/login')
 	# Get all the details to display first and then render
-	session['url']='/'
 	userdata = {}
 	getuserdata(userdata)
 	getuserfriends(userdata)
@@ -243,7 +263,6 @@ def logout():
 @app.route('/post',methods=['POST'])
 def post():
 	content = request.form['content']
-
 	f = request.files['picture']
 	if f:
 		f.save('static/'+f.filename)
@@ -375,37 +394,86 @@ def transaction():
 
 @app.route('/chats/<string:id>', methods=['GET'])
 def chat_message(id):
-    if not auth("/"): return redirect('/login')
-    if int(id):
-        session['fid'] = id
-    userdata = {}
-    messages = {}
-    getmessages(messages)
-    getuserdata(userdata)
-    getfrienddata(userdata)
-    getuserfriends(userdata)
-    getallusers(userdata)
-    getfriendsposts(userdata)
-    getfriendrequests(userdata)
-    return render_template('./chat.html',userdata=userdata, messages=messages)
+	if not auth("/"): return redirect('/login')
+	if int(id):
+		session['fid'] = id
+	userdata = {}
+	messages = {}
+	getmessages(messages)
+	getuserdata(userdata)
+	getfrienddata(userdata)
+	getuserfriends(userdata)
+	getallusers(userdata)
+	getfriendsposts(userdata)
+	getfriendrequests(userdata)
+	return render_template('./chat.html',userdata=userdata, messages=messages)
 
 @app.route('/chatstore', methods=['POST'])
 def chatstore():
-    if session['fid']:
-        content = request.form['content']
-        sql = "INSERT INTO `dbsproject`.`Messages` (`From`, `To`, `Content`, `timestamp`) VALUES ('%s', '%s', '%s', CURTIME());"%(session['userid'],session['fid'],content)
-        cursor.execute(sql)
-        mydb.commit()
-        return redirect(url_for('chat_message', id=session['fid']))
+	if session['fid']:
+		content = request.form['content']
+		sql = "INSERT INTO `dbsproject`.`Messages` (`From`, `To`, `Content`, `timestamp`) VALUES ('%s', '%s', '%s', CURTIME());"%(session['userid'],session['fid'],content)
+		cursor.execute(sql)
+		mydb.commit()
+		return redirect(url_for('chat_message', id=session['fid']))
 
 @app.route('/Attend/<string:id>', methods=['GET'])
 def Attend(id):
-    print(id)
-    print(session['userid'])
-    sql = "INSERT INTO `dbsproject`.`Attending` VALUES ('%s', '%s');"%(id,session['userid'])
-    cursor.execute(sql)
-    mydb.commit()
-    return redirect(url_for('events'))
+	print(id)
+	print(session['userid'])
+	sql = "INSERT INTO `dbsproject`.`Attending` VALUES ('%s', '%s');"%(id,session['userid'])
+	cursor.execute(sql)
+	mydb.commit()
+	return redirect(url_for('events'))
+
+
+@app.route('/community', methods=['GET'])
+def viewcommunity():
+	if not auth('/community'): return redirect('/login')
+	sql = "select * from Community";
+	cursor.execute(sql)
+	groups = cursor.fetchall()
+	return render_template('viewcommunity.html',groups = groups)
+
+
+@app.route('/groups/<string:id>', methods=['GET','POST'])
+def groups(id):
+	if request.method =='GET':
+		session['currentgroup'] = id	
+		userdata = {}
+		getuserdata(userdata)
+		getcommunityposts(userdata,id)
+		community = {}
+		getcommunity(community,id)
+		return render_template("groups.html",userdata = userdata, user = session['userid'],community = community)
+	else:
+		content = request.form['content']
+		f = request.files['picture']
+		if f:
+			f.save('static/'+f.filename)
+			sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`photosrc`,`community`) VALUES ('%s', '%s', CURTIME(),'static/%s',%s);"%(session['userid'],content,f.filename,session['currentgroup'])
+			cursor.execute(sql)
+		else:
+			sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`community`) VALUES ('%s', '%s', CURTIME(),%s);"%(session['userid'],content,session['currentgroup'])
+			cursor.execute(sql)
+		mydb.commit()
+		# Refresh, so that post is seen
+		return redirect("/groups"+session['currentgroup'])
+
+@app.route('/grouppost', methods=['POST'])
+def grouppost():
+		content = request.form['content']
+		f = request.files['picture']
+		if f:
+			f.save('static/'+f.filename)
+			sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`photosrc`,`community`) VALUES ('%s', '%s', CURTIME(),'static/%s',%s);"%(session['userid'],content,f.filename,session['currentgroup'])
+			cursor.execute(sql)
+		else:
+			sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`community`) VALUES ('%s', '%s', CURTIME(),%s);"%(session['userid'],content,session['currentgroup'])
+			cursor.execute(sql)
+		mydb.commit()
+		return redirect("/groups/"+session['currentgroup'])
+
 
 @app.route('/addevent', methods=['POST'])
 def addevent():
@@ -423,4 +491,4 @@ def addevent():
 	return redirect(url_for('events'))
 
 if __name__ == "__main__":
-    app.run(port=3000, debug=True)
+	app.run(port=3000, debug=True)
