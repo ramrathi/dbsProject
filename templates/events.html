@@ -67,7 +67,7 @@
         <!-- user profile -->
         <hr>
         <!-- timeline -->
-        
+
 
 
         <div>
@@ -100,7 +100,9 @@
                   	<span class="pull-right"><a href="marksold/{{p[0]}}">{{'[Mark as sold]'}}</a></span>
 
                   	{% else %}
-                  	<span class="pull-right"><a href="Attend/{{data["events"]["events"][p][0]}}">{{'[Attend]'}}</a></span>
+                    {% if data["attending"] == NULL %}
+                  	<span class="pull-right"><a href="Attend/{{[p][0]}}">{{'[Attend]'}}</a></span>
+					{% endif %}
                   {% endif %}
                 </div>
               </div>

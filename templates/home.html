@@ -82,13 +82,12 @@
               <div class="panel panel-default">
                 <div class="panel-footer">
                   <span><b>{{p[0]}}</b></span>
-                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
                   <span class="pull-right">{{p[2]}} &ensp;</span>
                 </div>
                 <div class="panel-body">
                   <p>{{p[1]}}</p>
                 {% if p[4] != None %}
-                  <img align = center src = "{{p[4]}}" height="300" width="300">
+                 <center> <img align = center src = "{{p[4]}}" height="300" width="300"> </center>
                 {% endif %}
                 </div>
                 <div class="panel-footer">
@@ -140,7 +139,7 @@
               {% for f in userdata['friends'] %}
               <li>
                 <a href="#">{{f[0]}}</a>
-                <a class="text-danger" href="chats/{{f[1]}}">[chat]</a>
+                <a class="text-success" href="chats/{{f[1]}}">[chat]</a>
                 <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
               </li>
               {% endfor %}
