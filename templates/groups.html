@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DBSbook</title>
+
+  <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+</head>
+<body>
+  <!-- nav -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">DBSbook</a>
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/transaction">Payments</a></li>
+        <li><a href="/community">Communities</a></li>
+        <li><a href="/music">Music</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/myprofile">Profile</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+  <!-- ./nav -->
+
+  <!-- main -->
+  <main class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <!-- profile brief -->
+        
+       <a href= "../community"><h3>Go Back</h3></a>
+         <div class="media">
+          <div class="media-left">
+            <img src= {{userdata['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
+          </div>
+          <div class="media-body">
+          </div>
+          <br>
+        </div>
+            <h2 class="media-heading">{{userdata["username"]}}</h2>
+            <p>Status: {{userdata['bio']}}</p>
+        <!-- ./profile brief -->
+
+        <!-- friend requests -->
+        
+        <!-- ./friend requests -->
+      </div>
+      <div class="col-md-6">
+        <!-- post form -->
+        <h1 align="center">{{community['name']}}</h1>
+          <p align="center">{{community['description']}}</p>
+            <hr>
+        <form method="post" action="post" enctype="multipart/form-data">
+          <div class="input-group">
+            <input class="form-control" type="text" name="content" placeholder="Make a post...">
+            <input class="form-control" type="file" name="picture"/>
+            <span class="input-group-btn">
+              <button class="btn btn-success" type="submit" name="post">Post</button>
+            </span>
+          </div>
+        </form><hr>
+        <!-- ./post form -->
+
+        <!-- feed -->
+        <div>
+          <!-- post -->
+
+          {% for p in userdata['posts'] %}
+              <form method="post" action="comment/add/{{p[5]}}">
+              <div class="panel panel-default">
+                <div class="panel-footer">
+                  <span><b>{{p[0]}}</b></span>
+                  <span class="pull-right">{{p[2]}} &ensp;</span>
+                </div>
+                <div class="panel-body">
+                  <p>{{p[1]}}</p>
+                {% if p[4] != None %}
+                 <center> <img align = center src = "../{{p[4]}}" height="300" width="300"> </center>
+                {% endif %}
+                </div>
+                <div class="panel-footer">
+                <div class="input-group">
+                  <input class="form-control" type="text" name="content" placeholder="Add a comment...">
+                  <span class="input-group-btn">
+                    <button class="btn btn-success" type="submit" name="comment">Comment</button>
+                  </span>
+                </div>
+              </form>
+                </div>
+                {% for c in userdata['comments'] %}
+                {% if c[1] == p[5] %}
+                <div class="panel-footer">
+                  <span>{{c[3]}}</span>
+                  <span class="pull-right"><a class="text-danger" href="comment/delete/{{c[0]}}">[delete]</a></span>
+                  <span class="pull-right"><b>{{c[2]}}&ensp;</b></span>
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+          {% endfor %}
+          <!-- ./post -->
+        </div>
+        <!-- ./feed -->
+      </div>
+      <div class="col-md-3">
+      <!-- add friend -->
+        <!-- ./add friend -->
+
+        <!-- friends -->
+
+        <!-- ./friends -->
+      </div>
+    </div>
+  </main>
+  <!-- ./main -->
+
+  <!-- footer -->
+  <footer class="container text-center">
+    <ul class="nav nav-pills pull-right">
+    </ul>
+  </footer>
+  <!-- ./footer -->
+  <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../static/js/script.js"></script>
+</body>
+</html>
