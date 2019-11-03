@@ -78,7 +78,13 @@
           <!-- post -->
 
           {% for p in userdata['posts'] %}
+              <form method="post" action="comment/add/{{p[5]}}">
               <div class="panel panel-default">
+                <div class="panel-footer">
+                  <span><b>{{p[0]}}</b></span>
+                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
+                  <span class="pull-right">{{p[2]}} &ensp;</span>
+                </div>
                 <div class="panel-body">
                   <p>{{p[1]}}</p>
                 {% if p[4] != None %}
@@ -86,9 +92,23 @@
                 {% endif %}
                 </div>
                 <div class="panel-footer">
-                  <span>posted {{p[2]}} by {{p[0]}}</span>
-                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
+			          <div class="input-group">
+			            <input class="form-control" type="text" name="content" placeholder="Add a comment...">
+			            <span class="input-group-btn">
+			              <button class="btn btn-success" type="submit" name="comment">Comment</button>
+			            </span>
+			          </div>
+			        </form>
                 </div>
+                {% for c in userdata['comments'] %}
+                {% if c[1] == p[5] %}
+                <div class="panel-footer">
+                  <span>{{c[3]}}</span>
+                  <span class="pull-right"><a class="text-danger" href="comment/delete/{{c[0]}}">[delete]</a></span>
+                  <span class="pull-right"><b>{{c[2]}}&ensp;</b></span>
+                </div>
+                {% endif %}
+                {% endfor %}
               </div>
           {% endfor %}
           <!-- ./post -->
