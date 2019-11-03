@@ -2,9 +2,8 @@
 <html>
 <head>
   <title>DBSbook</title>
-
-  <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="static/css/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 </head>
 <body>
   <!-- nav -->
@@ -39,8 +38,8 @@
           </div>
           <br>
         </div>
-            <h2 class="media-heading">{{userdata["username"]}}</h2>
-            <p>Status: {{userdata['bio']}}</p>
+            <h2 class="media-heading">{{userdata["friendname"]}}</h2>
+            <p>Status: {{userdata['fbio']}}</p>
         <!-- ./profile brief -->
 
         <!-- friend requests -->
@@ -62,55 +61,26 @@
       </div>
       <div class="col-md-6">
         <!-- post form -->
-        <form method="post" action="post" enctype="multipart/form-data">
-          <div class="input-group">
-            <input class="form-control" type="text" name="content" placeholder="Make a post...">
-            <input class="form-control" type="file" name="picture"/>
-            <span class="input-group-btn">
-              <button class="btn btn-success" type="submit" name="post">Post</button>
-            </span>
-          </div>
-        </form><hr>
+        <hr>
+        {% for f,h in messages['texts'],messages['users'] %}
+          <br> {{f[1]}} {{f[2]}} {{f[3]}} <br><small>{{f[4]}}</small><br>
+        {% endfor %}
+        {% for f in messages['users'] %}
+          <br><br><small>{{f}}</small><br>
+        {% endfor %}
+        <hr>
         <!-- ./post form -->
-
         <!-- feed -->
         <div>
           <!-- post -->
-
-          {% for p in userdata['posts'] %}
-              <form method="post" action="comment/add/{{p[5]}}">
-              <div class="panel panel-default">
-                <div class="panel-footer">
-                  <span><b>{{p[0]}}</b></span>
-                  <span class="pull-right"><a class="text-danger" href="posts/delete/{{p[3]}}">[delete]</a></span>
-                  <span class="pull-right">{{p[2]}} &ensp;</span>
-                </div>
-                <div class="panel-body">
-                  <p>{{p[1]}}</p>
-                {% if p[4] != None %}
-                  <img align = center src = "{{p[4]}}" height="300" width="300">
-                {% endif %}
-                </div>
-                <div class="panel-footer">
-			          <div class="input-group">
-			            <input class="form-control" type="text" name="content" placeholder="Add a comment...">
-			            <span class="input-group-btn">
-			              <button class="btn btn-success" type="submit" name="comment">Comment</button>
-			            </span>
-			          </div>
-			        </form>
-                </div>
-                {% for c in userdata['comments'] %}
-                {% if c[1] == p[5] %}
-                <div class="panel-footer">
-                  <span>{{c[3]}}</span>
-                  <span class="pull-right"><a class="text-danger" href="comment/delete/{{c[0]}}">[delete]</a></span>
-                  <span class="pull-right"><b>{{c[2]}}&ensp;</b></span>
-                </div>
-                {% endif %}
-                {% endfor %}
-              </div>
-          {% endfor %}
+          <form method="post" action="{{ url_for('chatstore') }}" enctype="multipart/form-data">
+            <div class="input-group">
+              <input class="form-control" type="text" name="content" placeholder="Send message">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit" name="chatstore">Send</button>
+              </span>
+            </div>
+          </form>
           <!-- ./post -->
         </div>
         <!-- ./feed -->

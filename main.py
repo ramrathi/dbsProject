@@ -68,7 +68,15 @@ def getuserdata(userdata):
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
 	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
-	userdata['profile_picture'] = session['picture']
+	# userdata['profile_picture'] = session['picture']
+
+def getfrienddata(userdata):
+    sql = "select name from Users where id=%s;"%(session['fid'])
+    sql2 = "select bio from Users where id=%s;"%(session['fid'])
+    cursor.execute(sql)
+    userdata['friendname'] = cursor.fetchone()[0]
+    cursor.execute(sql2)
+    userdata['fbio'] = cursor.fetchall()[0][0]
 
 def getwalletdata(userdata):
 	sql = "select wallet from Users where id = %s"%(session['userid'])
@@ -99,6 +107,20 @@ def getfriendrequests(data):
 	cursor.execute(sql)
 	data["requests"] = cursor.fetchall()
 
+def getmessages(messages):
+    sql = "select m.m_id,m.From,m.Content,m.media,m.timestamp from Messages m where m.m_id in(select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s UNION select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s);"%(session["userid"],session["fid"],session["fid"],session["userid"])
+    cursor.execute(sql)
+    messages['texts'] = cursor.fetchall()
+    messages['users'] = []
+    for i in messages['texts']:
+        print("id=")
+        print(i[1])
+        sql2 = "select name from Users where id=%s;"%(i[1])
+        cursor.execute(sql2)
+        n = cursor.fetchall()[0][0]
+        messages['users'].append(n)
+    print(messages['users'])
+    print(messages['texts'])
 
 @app.route('/',methods=['GET'])
 def home():
@@ -203,7 +225,7 @@ def myprofile():
 			print(sql)
 			session['status'] = status
 			cursor.execute(sql)
-				
+
 		mydb.commit()
 		refreshcookies()
 		return redirect('/myprofile')
@@ -219,9 +241,9 @@ def logout():
 def post():
 	content = request.form['content']
 
-	f = request.files['picture']  
+	f = request.files['picture']
 	if f:
-		f.save('static/'+f.filename) 
+		f.save('static/'+f.filename)
 		sql = "INSERT INTO `dbsproject`.`Posts` (`u_id`, `content`, `time_stamp`,`photosrc`) VALUES ('%s', '%s', CURTIME(),'static/%s');"%(session['userid'],content,f.filename)
 		cursor.execute(sql)
 	else:
@@ -264,10 +286,10 @@ def marksold(id):
 @app.route('/buy/<string:id>', methods=['GET'])
 def buy(id):
 
-	# Opportunity to put a trigger or something, if the 
-	# wallet value in Users goes negative then reset the sold 
+	# Opportunity to put a trigger or something, if the
+	# wallet value in Users goes negative then reset the sold
 	# and wallet. Basically don't sell it then
-	
+
 	sql = 'UPDATE Market set sold= 1 where i_id = %s'%(id)
 	sql2 = 'UPDATE Users set wallet = wallet - (select price from Market where i_id = %s) where id = %s'%(id,session['userid'])
 	cursor.execute(sql)
@@ -343,8 +365,33 @@ def transaction():
 		return render_template('./transaction.html',userdata=userdata)
 
 
+@app.route('/chats/<string:id>', methods=['GET'])
+def chat_message(id):
+    if not auth("/"): return redirect('/login')
+    if int(id):
+        session['fid'] = id
+    print("this is "+ session['fid'])
+    userdata = {}
+    messages = {}
+    getmessages(messages)
+    print(messages)
+    getuserdata(userdata)
+    getfrienddata(userdata)
+    getuserfriends(userdata)
+    getallusers(userdata)
+    getfriendsposts(userdata)
+    getfriendrequests(userdata)
+    return render_template('./chat.html',userdata=userdata, messages=messages)
 
-
+@app.route('/chatstore', methods=['POST'])
+def chatstore():
+    print("HERE")
+    if session['fid']:
+        content = request.form['content']
+        sql = "INSERT INTO `dbsproject`.`Messages` (`From`, `To`, `Content`, `timestamp`) VALUES ('%s', '%s', '%s', CURTIME());"%(session['userid'],session['fid'],content)
+        cursor.execute(sql)
+        mydb.commit()
+        return redirect(url_for('chat_message', id=session['fid']))
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
