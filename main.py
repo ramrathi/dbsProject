@@ -58,6 +58,7 @@ def geteventdata(data):
 	data['event_friends'] = {}
 	cursor.execute(sql)
 	events = cursor.fetchall()
+	print(events)
 	cursor.execute(sql2)
 	event_friends = cursor.fetchall()
 	for e in events:
@@ -340,9 +341,6 @@ def events():
 		data['userdata'] = {}
 		geteventdata(data['events'])
 		getuserdata(data['userdata'])
-		sql3 = "select user_id from Attending where user_id = %s;"%(session['userid'])
-		cursor.execute(sql3)
-		data['attending'] = cursor.fetchall()
 		return render_template("./events.html",data = data)
 
 @app.route('/comment/<string:action>/<string:id>', methods=['POST','GET'])
@@ -408,6 +406,21 @@ def Attend(id):
     cursor.execute(sql)
     mydb.commit()
     return redirect(url_for('events'))
+
+@app.route('/addevent', methods=['POST'])
+def addevent():
+	description = request.form['description']
+	location = request.form['location']
+	f = request.files['media']
+	if f:
+		f.save('static/'+f.filename)
+		sql = "INSERT INTO `dbsproject`.`Events` (`host`,`location`,`description`,mediasrc) VALUES('%s','%s','%s','static/%s')"%(session['userid'],location,description,f.filename)
+		cursor.execute(sql)
+	else:
+		sql = "INSERT INTO `dbsproject`.`Events` (`host`,`location`,`description`) VALUES('%s','%s','%s')"%(session['userid'],location,description)
+		cursor.execute(sql)
+	mydb.commit()
+	return redirect(url_for('events'))
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
