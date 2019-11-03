@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta http-equiv="refresh" content="5"/>
   <title>DBSbook</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
@@ -62,11 +63,17 @@
       <div class="col-md-6">
         <!-- post form -->
         <hr>
-        {% for f,h in messages['texts'],messages['users'] %}
-          <br> {{f[1]}} {{f[2]}} {{f[3]}} <br><small>{{f[4]}}</small><br>
-        {% endfor %}
-        {% for f in messages['users'] %}
-          <br><br><small>{{f}}</small><br>
+        {% for f in messages['texts'] %}
+          {% if f[1] == userdata['userid'] %}
+          <div align="right" style="background-color:lightgreen">
+          {% else %}
+          <div style="background-color:lightblue">
+          {% endif %}
+          <!-- <br> -->
+         
+          <h4> <br>&nbsp;&nbsp;{{f[2]}} &nbsp;&nbsp;</h4><small>&nbsp;&nbsp;&nbsp;<b>{{f[5]}}</b></small>&nbsp;&nbsp;
+          <small>{{f[4]}}&nbsp;&nbsp;&nbsp;</small><hr>
+        </div>
         {% endfor %}
         <hr>
         <!-- ./post form -->
@@ -78,6 +85,7 @@
               <input class="form-control" type="text" name="content" placeholder="Send message">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit" name="chatstore">Send</button>
+                <br><br><hr>
               </span>
             </div>
           </form>
@@ -110,8 +118,8 @@
               {% for f in userdata['friends'] %}
               <li>
                 <a href="#">{{f[0]}}</a>
-                <a class="text-danger" href="chats/{{f[1]}}">[chat]</a>
-                <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
+                <a class="text-danger" href="../chats/{{f[1]}}">[chat]</a>
+                <a class="text-danger" href="../../friends/delete/{{f[1]}}">[unfriend]</a>
               </li>
               {% endfor %}
             </ul>

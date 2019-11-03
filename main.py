@@ -108,7 +108,7 @@ def getfriendrequests(data):
 	data["requests"] = cursor.fetchall()
 
 def getmessages(messages):
-    sql = "select m.m_id,m.From,m.Content,m.media,m.timestamp from Messages m where m.m_id in(select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s UNION select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s);"%(session["userid"],session["fid"],session["fid"],session["userid"])
+    sql = "select M.*,Users.name from Users join (select m.m_id,m.From,m.Content,m.media,m.timestamp from Messages m where m.m_id in(select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s UNION select m1.m_id from Messages m1 where m1.To=%s and m1.From=%s)) as M on M.From = Users.id;"%(session["userid"],session["fid"],session["fid"],session["userid"])
     cursor.execute(sql)
     messages['texts'] = cursor.fetchall()
     messages['users'] = []
@@ -375,17 +375,18 @@ def chat_message(id):
     if not auth("/"): return redirect('/login')
     if int(id):
         session['fid'] = id
-    print("this is "+ session['fid'])
     userdata = {}
     messages = {}
     getmessages(messages)
-    print(messages)
     getuserdata(userdata)
     getfrienddata(userdata)
     getuserfriends(userdata)
     getallusers(userdata)
     getfriendsposts(userdata)
     getfriendrequests(userdata)
+
+
+
     return render_template('./chat.html',userdata=userdata, messages=messages)
 
 @app.route('/chatstore', methods=['POST'])
