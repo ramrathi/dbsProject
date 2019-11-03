@@ -96,6 +96,7 @@
               {% for f in userdata['friends'] %}
               <li>
                 <a href="#">{{f[0]}}</a>
+                <a class="text-danger" href="chats/{{f[1]}}">[chat]</a>
                 <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
               </li>
               {% endfor %}

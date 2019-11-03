@@ -18,6 +18,7 @@
 --
 -- Table structure for table `Attending`
 --
+USE dbsproject;
 
 DROP TABLE IF EXISTS `Attending`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
