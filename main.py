@@ -67,16 +67,19 @@ def getuserdata(userdata):
 	userdata['username'] = session['username']
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
-	# Currently hardcoded to the link of my fb profile picture, need to add new colun in the Users table to support and store this
-	# userdata['profile_picture'] = session['picture']
-
+	userdata['profile_picture'] = session['picture']
+	
 def getfrienddata(userdata):
     sql = "select name from Users where id=%s;"%(session['fid'])
     sql2 = "select bio from Users where id=%s;"%(session['fid'])
+    sql3 = "select picture from Users where id=%s;"%(session['fid'])
     cursor.execute(sql)
     userdata['friendname'] = cursor.fetchone()[0]
     cursor.execute(sql2)
     userdata['fbio'] = cursor.fetchall()[0][0]
+    cursor.execute(sql3)
+    userdata['fprofile_picture'] = cursor.fetchall()[0][0]
+    print(userdata['fprofile_picture'])
 
 def getwalletdata(userdata):
 	sql = "select wallet from Users where id = %s"%(session['userid'])
@@ -134,7 +137,6 @@ def home():
 	getallusers(userdata)
 	getfriendsposts(userdata)
 	getfriendrequests(userdata)
-	# print(userdata["posts"])
 	return render_template("./home.html",userdata = userdata)
 
 @app.route('/login',methods=['GET','POST'])
@@ -384,9 +386,6 @@ def chat_message(id):
     getallusers(userdata)
     getfriendsposts(userdata)
     getfriendrequests(userdata)
-
-
-
     return render_template('./chat.html',userdata=userdata, messages=messages)
 
 @app.route('/chatstore', methods=['POST'])
