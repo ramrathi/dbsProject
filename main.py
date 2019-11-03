@@ -340,7 +340,12 @@ def transaction():
 		userdata = {}
 		getwalletdata(userdata)
 		getuserdata(userdata)
+		getuserfriends(userdata)
 		return render_template('./transaction.html',userdata=userdata)
+	else:
+		if not auth("/transaction"): return redirect('/login')
+		f_id = request.form["friends"]	
+		amount = request.form["amount"]	
 
 
 
