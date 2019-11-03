@@ -65,12 +65,10 @@
         <hr>
         {% for f in messages['texts'] %}
           {% if f[1] == userdata['userid'] %}
-          <div align="right" style="background-color:lightgreen">
+          <div align="right" style="background-color:#e4eded">
           {% else %}
-          <div style="background-color:lightblue">
+          <div style="background-color:#c7c7c7">
           {% endif %}
-          <!-- <br> -->
-         
           <h4> <br>&nbsp;&nbsp;{{f[2]}} &nbsp;&nbsp;</h4><small>&nbsp;&nbsp;&nbsp;<b>{{f[5]}}</b></small>&nbsp;&nbsp;
           <small>{{f[4]}}&nbsp;&nbsp;&nbsp;</small><hr>
         </div>

@@ -68,7 +68,7 @@ def getuserdata(userdata):
 	userdata['userid'] = session['userid']
 	userdata['bio'] = session['bio']
 	userdata['profile_picture'] = session['picture']
-	
+
 def getfrienddata(userdata):
     sql = "select name from Users where id=%s;"%(session['fid'])
     sql2 = "select bio from Users where id=%s;"%(session['fid'])
@@ -137,7 +137,7 @@ def home():
 	getallusers(userdata)
 	getfriendsposts(userdata)
 	getfriendrequests(userdata)
-	return render_template("./home.html",userdata = userdata)
+	return render_template("./home.html",userdata = userdata, user = session['userid'])
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -340,6 +340,9 @@ def events():
 		data['userdata'] = {}
 		geteventdata(data['events'])
 		getuserdata(data['userdata'])
+		sql3 = "select user_id from Attending where user_id = %s;"%(session['userid'])
+		cursor.execute(sql3)
+		data['attending'] = cursor.fetchall()
 		return render_template("./events.html",data = data)
 
 @app.route('/comment/<string:action>/<string:id>', methods=['POST','GET'])
@@ -368,8 +371,8 @@ def transaction():
 		return render_template('./transaction.html',userdata=userdata)
 	else:
 		if not auth("/transaction"): return redirect('/login')
-		f_id = request.form["friends"]	
-		amount = request.form["amount"]	
+		f_id = request.form["friends"]
+		amount = request.form["amount"]
 
 
 @app.route('/chats/<string:id>', methods=['GET'])
@@ -390,13 +393,21 @@ def chat_message(id):
 
 @app.route('/chatstore', methods=['POST'])
 def chatstore():
-    print("HERE")
     if session['fid']:
         content = request.form['content']
         sql = "INSERT INTO `dbsproject`.`Messages` (`From`, `To`, `Content`, `timestamp`) VALUES ('%s', '%s', '%s', CURTIME());"%(session['userid'],session['fid'],content)
         cursor.execute(sql)
         mydb.commit()
         return redirect(url_for('chat_message', id=session['fid']))
+
+@app.route('/Attend/<string:id>', methods=['GET'])
+def Attend(id):
+    print(id)
+    print(session['userid'])
+    sql = "INSERT INTO `dbsproject`.`Attending` VALUES ('%s', '%s');"%(id,session['userid'])
+    cursor.execute(sql)
+    mydb.commit()
+    return redirect(url_for('events'))
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
