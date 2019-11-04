@@ -55,38 +55,37 @@
       <div class="col-md-6">
         <h1 align="center">All Communitites</h1>
         <!-- user profile -->
-       
+
         <!-- user profile -->
-        <hr>
         <!-- timeline -->
 
 
 
         <div>
         <!-- post form -->
-        
+
           <!-- Events -->
               <div class="panel panel-default">
                 <div class="panel-body">
+					<center>
           {% for g in groups %}
                   <h3>{{g[1]}}</h3>
                   <p>{{g[2]}}</p>
                 <div>
-                <div class="panel-footer">
-                    <a href = "../groups/{{g[0]}}"">
-                  <img src = "../static/img/enter.png" height="40" width="90">
+
+                    <a href = "../groups/{{g[0]}}">
+                  <button class="btn btn-success" type="submit" name="enter">Enter</button>
                   </a>
-                </div>
-                <hr>
           {% endfor %}
               </div>
+		  </center>
           <!-- ./Events -->
         </div>
         <!-- ./timeline -->
       </div>
       <div class="col-md-3">
         <!-- friends -->
-       
+
         <!-- ./friends -->
       </div>
     </div>

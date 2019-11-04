@@ -433,13 +433,14 @@ def viewcommunity():
 	sql = "select * from Community";
 	cursor.execute(sql)
 	groups = cursor.fetchall()
+	print(groups)
 	return render_template('viewcommunity.html',groups = groups)
 
 
 @app.route('/groups/<string:id>', methods=['GET','POST'])
 def groups(id):
 	if request.method =='GET':
-		session['currentgroup'] = id	
+		session['currentgroup'] = id
 		userdata = {}
 		getuserdata(userdata)
 		getcommunityposts(userdata,id)
