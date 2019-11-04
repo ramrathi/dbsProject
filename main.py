@@ -569,5 +569,22 @@ def addtoplaylist(s_id):
 	mydb.commit()
 	return redirect('/music')
 
+@app.route('/addmarketitem', methods=['POST'])
+def addmarketitem():
+	title = request.form['title']
+	description= request.form['description']
+	price = request.form['price']
+	f = request.files['picture']
+	if f:
+		f.save('static/'+f.filename)
+		sql = "INSERT INTO `dbsproject`.`Market` (`title`,`description`,`price`,`seller`,`sold`) VALUES('%s','%s','%s',%s,0)"%(title,description,price,session['userid'])
+		cursor.execute(sql)
+	else:
+		sql = "INSERT INTO `dbsproject`.`Market` (`title`,`description`,`price`,`seller`,`sold`) VALUES('%s','%s','%s',%s,0)"%(title,description,price,session['userid'])
+		cursor.execute(sql)
+	mydb.commit()
+	return redirect('/market')
+
+
 if __name__ == "__main__":
 	app.run(port=3000, debug=True)

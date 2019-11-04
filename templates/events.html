@@ -55,15 +55,7 @@
       <div class="col-md-6">
       	<h1 align="center">Events</h1>
         <!-- user profile -->
-       <!--  <div class="media">
-          <div class="media-left">
-            <img src= {{data['userdata']['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
-          </div>
-          <div class="media-body">
-            <h2 class="media-heading">{{data['userdata']["username"]}}</h2>
-            <p>Status: {{data['userdata']['bio']}}</p>
-          </div>
-        </div> -->
+      
         <!-- user profile -->
         <!-- timeline -->
 
@@ -88,7 +80,7 @@
                   <h3>{{data["events"]["events"][p][3]}}</h3>
                   <p>{{data["events"]["events"][p][2]}}</p>
                   {% if data['events']['events'][p][4] != None %}
-                    <center><img src = "/static/{{data['events']['events'][p][4]}}" height="300" width="300"></center>
+                    <center><img src = "/{{data['events']['events'][p][4]}}" height="300" width="300"></center>
                   {% endif %}
                 </div>
                 <div class="panel-footer">
