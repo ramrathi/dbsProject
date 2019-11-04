@@ -75,13 +75,16 @@ def getcommunityposts(userdata,id):
 def geteventdata(data):
 	sql = "select e_id,host,location,description,mediasrc,count(*) as count from Events join Attending where Attending.event_id = Events.e_id group by e_id;"
 	sql2 = "select e_id,user_id from (Events join Attending on Events.e_id = Attending.event_id) where user_id in (select u2_id from Friends where u1_id = %s);"%(session['userid'])
+	sql3 = "select event_id from Attending where user_id='%s';"%(session['userid'])
 	data['events'] = {}
 	data['event_friends'] = {}
 	cursor.execute(sql)
 	events = cursor.fetchall()
-	print(events)
 	cursor.execute(sql2)
 	event_friends = cursor.fetchall()
+	cursor.execute(sql3)
+	user_events = cursor.fetchall()
+	data['user_events'] = [item[0] for item in user_events]
 	for e in events:
 		data['events'][int(e[0])] = e + tuple([[x[1] for x in event_friends if x[0] == e[0]]]) ;
 
@@ -445,23 +448,40 @@ def Attend(id):
 @app.route('/community', methods=['GET'])
 def viewcommunity():
 	if not auth('/community'): return redirect('/login')
-	sql = "select * from Community";
+	userdata = {}
+	getuserdata(userdata)
+	getuserfriends(userdata)
+	getallusers(userdata)
+	getfriendrequests(userdata)
+	sql = "select * from Community;"
 	cursor.execute(sql)
 	groups = cursor.fetchall()
-	print(groups)
-	return render_template('viewcommunity.html',groups = groups)
+	sql2 = "select * from Community, Belongs where community_id=c_id and user_id=(%s)"%(session['userid'])
+	cursor.execute(sql2)
+	communities = cursor.fetchall()
+	print(communities)
+	return render_template('viewcommunity.html',groups = groups, userdata = userdata, user = session['userid'], communities=communities)
 
 
 @app.route('/groups/<string:id>', methods=['GET','POST'])
 def groups(id):
 	if request.method =='GET':
+		sql = 'Select * from Belongs,Users where community_id='+id+' and user_id=id;'
+		cursor.execute(sql)
+		users = cursor.fetchall()
+		print(users)
+		c_users = [item[0] for item in users]
+		if session['userid'] not in c_users:
+			sql2 = "INSERT INTO `dbsproject`.`Belongs` VALUES('%s','%s');"%(session['userid'],id)
+			cursor.execute(sql2)
+			mydb.commit()
 		session['currentgroup'] = id
 		userdata = {}
 		getuserdata(userdata)
 		getcommunityposts(userdata,id)
 		community = {}
 		getcommunity(community,id)
-		return render_template("groups.html",userdata = userdata, user = session['userid'],community = community)
+		return render_template("groups.html", userdata = userdata, user = session['userid'], community = community, users=users)
 	else:
 		content = request.form['content']
 		f = request.files['picture']
@@ -509,14 +529,45 @@ def addevent():
 
 @app.route('/music', methods=['GET'])
 def music():
-
-	return render_template('music.html')
-
+	userdata = {}
+	getuserdata(userdata)
+	getuserfriends(userdata)
+	getallusers(userdata)
+	getfriendsposts(userdata)
+	getfriendrequests(userdata)
+	sql = "select * from Music;"
+	cursor.execute(sql)
+	songs = cursor.fetchall()
+	print(songs)
+	sql2 = "select * from Music, Playlist where s_id=song_id and user_id='%s';"%(session['userid'])
+	cursor.execute(sql2)
+	playlist = cursor.fetchall()
+	play = [item[0] for item in playlist]
+	print(play)
+	return render_template('music.html', songs=songs, userdata = userdata, user = session['userid'], playlist=playlist, play=play)
 
 @app.route('/musicvideo/<string:id>', methods=['GET'])
 def musicvideo(id):
-	video=["tgbNymZ7vqY"]
-	return render_template('musicplayer.html',video=video)
+	userdata = {}
+	getuserdata(userdata)
+	getuserfriends(userdata)
+	getallusers(userdata)
+	getfriendsposts(userdata)
+	getfriendrequests(userdata)
+	sql = "select * from Music where s_id='%s';"%(id)
+	cursor.execute(sql)
+	video = cursor.fetchall()
+	sql2 = "select * from Music, Playlist where s_id=song_id and user_id='%s';"%(session['userid'])
+	cursor.execute(sql2)
+	playlist = cursor.fetchall()
+	return render_template('musicplayer.html',video=video, userdata = userdata, user = session['userid'], playlist=playlist)
+
+@app.route('/addtoplaylist/<string:s_id>', methods=['GET'])
+def addtoplaylist(s_id):
+	sql = "INSERT INTO `dbsproject`.`Playlist`VALUES('%s','%s')"%(session['userid'],s_id)
+	cursor.execute(sql)
+	mydb.commit()
+	return redirect('/music')
 
 if __name__ == "__main__":
 	app.run(port=3000, debug=True)
