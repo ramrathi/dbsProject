@@ -147,6 +147,12 @@ def getmessages(messages):
 	print(messages['users'])
 	print(messages['texts'])
 
+def gettransactions(userdata):
+	sql = "select * from Transactions, Users where `from` =%s and `to`=id  order by timestamp desc;"%(session['userid'])
+	cursor.execute(sql)
+	transactions = cursor.fetchall()
+	userdata['transactions'] = transactions
+
 @app.route('/',methods=['GET'])
 def home():
 	# If user not logged in
@@ -385,12 +391,21 @@ def transaction():
 		getwalletdata(userdata)
 		getuserdata(userdata)
 		getuserfriends(userdata)
+		gettransactions(userdata)
 		return render_template('./transaction.html',userdata=userdata)
 	else:
 		if not auth("/transaction"): return redirect('/login')
 		f_id = request.form["friends"]
 		amount = request.form["amount"]
-
+		message = request.form["message"]
+		sql = 'UPDATE Users set wallet = wallet-%s where id = %s'%(amount,session['userid'])
+		sql2 = 'UPDATE Users set wallet = wallet + %s where id = %s'%(amount,f_id)
+		sql3 = "INSERT INTO `dbsproject`.`Transactions` (`from`, `to`, `money`, `timestamp`, `message`) VALUES ('%s', '%s', '%s', CURTIME(), '%s');"%(session['userid'],f_id,amount,message)
+		cursor.execute(sql)
+		cursor.execute(sql2)
+		cursor.execute(sql3)
+		mydb.commit()
+		return redirect("/transaction")
 
 @app.route('/chats/<string:id>', methods=['GET'])
 def chat_message(id):
@@ -490,6 +505,18 @@ def addevent():
 		cursor.execute(sql)
 	mydb.commit()
 	return redirect(url_for('events'))
+
+
+@app.route('/music', methods=['GET'])
+def music():
+
+	return render_template('music.html')
+
+
+@app.route('/musicvideo/<string:id>', methods=['GET'])
+def musicvideo(id):
+	video=["tgbNymZ7vqY"]
+	return render_template('musicplayer.html',video=video)
 
 if __name__ == "__main__":
 	app.run(port=3000, debug=True)

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DBSbook</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+<body>
+  <!-- nav -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">DBSbook</a>
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/transaction">Payments</a></li>
+        <li><a href="/community">Communities</a></li>
+        <li><a href="/music">Music</a></li>
+        <li><a href="/events">Events</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/myprofile">Profile</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+  <!-- ./nav -->
+
+  <!-- main -->
+  <main class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <!-- edit profile -->
+<!--         <div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Edit profile</h4>
+            <form method="post" action="">
+              <div class="form-group">
+                <input class="form-control" type="text" name="status" placeholder="Status" value="">
+              </div>
+
+              <div class="form-group">
+                <input class="form-control" type="text" name="location" placeholder="Location" value="">
+              </div>
+
+              <div class="form-group">
+                <input class="btn btn-primary" type="submit" name="update_profile" value="Save">
+              </div>
+            </form>
+          </div>
+        </div> -->
+        <!-- ./edit profile -->
+      </div>
+
+      <div class="col-md-6">
+      	<h1 align="center">Music Player</h1>
+
+        <div>
+        <!-- post form -->
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{video[0]}}?autoplay=1&modestbranding=1&autohide=1&controls=1&showinfo=0&rel=0"></iframe>
+        </div>
+        <!-- ./timeline -->
+      </div>
+      <div class="col-md-3">
+
+      </div>
+    </div>
+  </main>
+  <!-- ./main -->
+
+  <!-- footer -->
+  <footer class="container text-center">
+    <ul class="nav nav-pills pull-right">
+      <!-- <li>DBSbook - Made by [your name here]</li> -->
+    </ul>
+  </footer>
+  <!-- ./footer -->
+  <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="static/js/script.js"></script>
+</body>
+</html>
