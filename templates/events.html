@@ -65,20 +65,19 @@
           </div>
         </div> -->
         <!-- user profile -->
-        <hr>
         <!-- timeline -->
 
 
 
         <div>
         <!-- post form -->
-        <form method="post" action="post" enctype="multipart/form-data">
+        <form method="post" action="addevent" enctype="multipart/form-data">
           <div class="input-group">
-            <input class="form-control" type="text" name="title" placeholder="Title">
             <input class="form-control" type="text" name="description" placeholder="Description...">
             <input class="form-control" type="text" name="location" placeholder="Location">
+			<input class="form-control" type="file" name="media"/>
             <span class="input-group-btn">
-              <button class="btn btn-success" type="submit" name="post">Post</button>
+              <button class="btn btn-success" type="submit" name="addevent">Post</button>
             </span>
           </div>
         </form><hr>
@@ -89,7 +88,7 @@
                   <h3>{{data["events"]["events"][p][3]}}</h3>
                   <p>{{data["events"]["events"][p][2]}}</p>
                   {% if data['events']['events'][p][4] != None %}
-                    <img src = "/static/{{data['events']['events'][p][4]}}" height="300" width="300">
+                    <center><img src = "/static/{{data['events']['events'][p][4]}}" height="300" width="300"></center>
                   {% endif %}
                 </div>
                 <div class="panel-footer">
@@ -100,9 +99,7 @@
                   	<span class="pull-right"><a href="marksold/{{p[0]}}">{{'[Mark as sold]'}}</a></span>
 
                   	{% else %}
-                    {% if data["attending"] == NULL %}
                   	<span class="pull-right"><a href="Attend/{{[p][0]}}">{{'[Attend]'}}</a></span>
-					{% endif %}
                   {% endif %}
                 </div>
               </div>

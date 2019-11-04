@@ -79,6 +79,7 @@ def geteventdata(data):
 	data['event_friends'] = {}
 	cursor.execute(sql)
 	events = cursor.fetchall()
+	print(events)
 	cursor.execute(sql2)
 	event_friends = cursor.fetchall()
 	for e in events:
@@ -145,6 +146,12 @@ def getmessages(messages):
 		messages['users'].append(n)
 	print(messages['users'])
 	print(messages['texts'])
+
+def gettransactions(userdata):
+	sql = "select * from Transactions, Users where `from` =%s and `to`=id  order by timestamp desc;"%(session['userid'])
+	cursor.execute(sql)
+	transactions = cursor.fetchall()
+	userdata['transactions'] = transactions
 
 @app.route('/',methods=['GET'])
 def home():
@@ -359,9 +366,6 @@ def events():
 		data['userdata'] = {}
 		geteventdata(data['events'])
 		getuserdata(data['userdata'])
-		sql3 = "select user_id from Attending where user_id = %s;"%(session['userid'])
-		cursor.execute(sql3)
-		data['attending'] = cursor.fetchall()
 		return render_template("./events.html",data = data)
 
 @app.route('/comment/<string:action>/<string:id>', methods=['POST','GET'])
@@ -387,12 +391,21 @@ def transaction():
 		getwalletdata(userdata)
 		getuserdata(userdata)
 		getuserfriends(userdata)
+		gettransactions(userdata)
 		return render_template('./transaction.html',userdata=userdata)
 	else:
 		if not auth("/transaction"): return redirect('/login')
 		f_id = request.form["friends"]
 		amount = request.form["amount"]
-
+		message = request.form["message"]
+		sql = 'UPDATE Users set wallet = wallet-%s where id = %s'%(amount,session['userid'])
+		sql2 = 'UPDATE Users set wallet = wallet + %s where id = %s'%(amount,f_id)
+		sql3 = "INSERT INTO `dbsproject`.`Transactions` (`from`, `to`, `money`, `timestamp`, `message`) VALUES ('%s', '%s', '%s', CURTIME(), '%s');"%(session['userid'],f_id,amount,message)
+		cursor.execute(sql)
+		cursor.execute(sql2)
+		cursor.execute(sql3)
+		mydb.commit()
+		return redirect("/transaction")
 
 @app.route('/chats/<string:id>', methods=['GET'])
 def chat_message(id):
@@ -435,13 +448,14 @@ def viewcommunity():
 	sql = "select * from Community";
 	cursor.execute(sql)
 	groups = cursor.fetchall()
+	print(groups)
 	return render_template('viewcommunity.html',groups = groups)
 
 
 @app.route('/groups/<string:id>', methods=['GET','POST'])
 def groups(id):
 	if request.method =='GET':
-		session['currentgroup'] = id	
+		session['currentgroup'] = id
 		userdata = {}
 		getuserdata(userdata)
 		getcommunityposts(userdata,id)
@@ -476,6 +490,33 @@ def grouppost():
 		mydb.commit()
 		return redirect("/groups/"+session['currentgroup'])
 
+
+@app.route('/addevent', methods=['POST'])
+def addevent():
+	description = request.form['description']
+	location = request.form['location']
+	f = request.files['media']
+	if f:
+		f.save('static/'+f.filename)
+		sql = "INSERT INTO `dbsproject`.`Events` (`host`,`location`,`description`,mediasrc) VALUES('%s','%s','%s','static/%s')"%(session['userid'],location,description,f.filename)
+		cursor.execute(sql)
+	else:
+		sql = "INSERT INTO `dbsproject`.`Events` (`host`,`location`,`description`) VALUES('%s','%s','%s')"%(session['userid'],location,description)
+		cursor.execute(sql)
+	mydb.commit()
+	return redirect(url_for('events'))
+
+
+@app.route('/music', methods=['GET'])
+def music():
+
+	return render_template('music.html')
+
+
+@app.route('/musicvideo/<string:id>', methods=['GET'])
+def musicvideo(id):
+	video=["tgbNymZ7vqY"]
+	return render_template('musicplayer.html',video=video)
 
 if __name__ == "__main__":
 	app.run(port=3000, debug=True)
