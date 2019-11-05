@@ -44,9 +44,6 @@ def getcommunity(comm,id):
 	comm['id'] = c[0][0]
 	comm['name'] = c[0][1]
 	comm['description'] = c[0][2]
-	print("*********")
-	print(c)
-	print("*********")
 
 
 def getfriendsposts(userdata):
@@ -115,7 +112,7 @@ def getwalletdata(userdata):
 
 def getuserfriends(userdata):
 	# Overcomplicated query for extra marks ;)
-	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
+	sql = "select distinct y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
 	cursor.execute(sql)
 	friends = cursor.fetchall()
 	userdata['friends'] = friends
