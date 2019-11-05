@@ -52,7 +52,7 @@ def getcommunity(comm,id):
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
+	sql = 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where u_id = id and community is null and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
@@ -116,7 +116,7 @@ def getwalletdata(userdata):
 
 def getuserfriends(userdata):
 	# Overcomplicated query for extra marks ;)
-	sql = "select y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
+	sql = "select distinct y.name,u2_id from Users join Friends on (Users.id = Friends.u1_id) join (select u2_id,name from Users join Friends on (Users.id = Friends.u2_id)) as y using(u2_id) where id = %s;"%(userdata['userid'])
 	cursor.execute(sql)
 	friends = cursor.fetchall()
 	userdata['friends'] = friends
@@ -213,7 +213,7 @@ def register():
 		dob = '1999-05-27'
 		gender = 1
 		# The wallet is being set to random as for some reason wallet is unique? someone change this lmao
-		wallet = random.randrange(0,100000)
+		wallet = 1000
 		sql = "select * from Users where email = '%s';"%email
 		cursor.execute(sql)
 		data = cursor.fetchall()
@@ -599,4 +599,4 @@ def addcommunity():
 	return redirect('/community')
 
 if __name__ == "__main__":
-	app.run(port=3000, debug=True)
+	app.run(port=3000, debug=False)
