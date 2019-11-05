@@ -29,66 +29,74 @@
   <!-- main -->
   <main class="container">
     <div class="row">
-      <div class="col-md-3">
-        <!-- edit profile -->
-<!--         <div class="panel panel-default">
-          <div class="panel-body">
-            <h4>Edit profile</h4>
-            <form method="post" action="">
-              <div class="form-group">
-                <input class="form-control" type="text" name="status" placeholder="Status" value="">
-              </div>
-
-              <div class="form-group">
-                <input class="form-control" type="text" name="location" placeholder="Location" value="">
-              </div>
-
-              <div class="form-group">
-                <input class="btn btn-primary" type="submit" name="update_profile" value="Save">
-              </div>
-            </form>
-          </div>
-        </div> -->
-        <!-- ./edit profile -->
-      </div>
+		<div class="col-md-3">
+          <!-- edit profile -->
+          <br><br><br>
+		  <h4><center>Add a Community</center></h4>
+  		<form method="post" action="addcommunity" enctype="multipart/form-data">
+            <div class="input-group">
+              <input class="form-control" type="text" name="title" placeholder="Name of Your Community">
+              <input class="form-control" type="text" name="description" placeholder="Enter Description">
+            </div>
+                <button class="btn btn-success" type="submit" name="post">Post</button>
+          </form><hr>
+          <!-- ./edit profile -->
+        </div>
 
       <div class="col-md-6">
-        <h1 align="center">All Communitites</h1>
-        <!-- user profile -->
-
-        <!-- user profile -->
-        <!-- timeline -->
-
-
-
-        <div>
-        <!-- post form -->
-
-          <!-- Events -->
-              <div class="panel panel-default">
-                <div class="panel-body">
-					<center>
+        <h1 align="center">Join a Community</h1>
           {% for g in groups %}
+		  <div class="panel panel-default">
+			<div class="panel-body">
+				<center>
                   <h3>{{g[1]}}</h3>
                   <p>{{g[2]}}</p>
                 <div>
-
                     <a href = "../groups/{{g[0]}}">
                   <button class="btn btn-success" type="submit" name="enter">Enter</button>
                   </a>
-          {% endfor %}
               </div>
 		  </center>
           <!-- ./Events -->
         </div>
         <!-- ./timeline -->
       </div>
+	  {% endfor %}
+  </div>
       <div class="col-md-3">
+		  <br>
+		  <br>
+		  <br>
+		  <br>
+		  <div class="panel panel-default">
+            <div class="panel-body">
+              <h4>Your Communities</h4>
+              <ul>
+                {% for f in communities %}
+                <li>
+                  <a href="../groups/{{f[0]}}">{{f[1]}}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         <!-- friends -->
-
+		<div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Friends</h4>
+            <ul>
+              {% for f in userdata['friends'] %}
+              <li>
+                <a href="#">{{f[0]}}</a>
+                <a class="text-success" href="chats/{{f[1]}}">[chat]</a>
+                <a class="text-danger" href="friends/delete/{{f[1]}}">[unfriend]</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
         <!-- ./friends -->
       </div>
-    </div>
   </main>
   <!-- ./main -->
 

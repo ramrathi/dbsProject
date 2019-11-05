@@ -32,34 +32,20 @@
       <div class="col-md-3">
         <!-- edit profile -->
         <br><br><br><br><br>
-<form method="post" action="addmarketitem" enctype="multipart/form-data">
+		<form method="post" action="addmarketitem" enctype="multipart/form-data">
           <div class="input-group">
             <input class="form-control" type="text" name="title" placeholder="Make a post...">
             <input class="form-control" type="text" name="description" placeholder="Enter Description">
             <input class="form-control" type="text" name="price" placeholder="Enter Price">
-            <input class="form-control" type="file" name="picture"/>
           </div>
-          <br>
-            <span class="input-group-btn">
+			<input class="form-control-file" type="file" name="picture"/>
+			<br>
               <button class="btn btn-success" type="submit" name="post">Post</button>
-            </span>
-        </form><hr> 
+        </form><hr>
         <!-- ./edit profile -->
       </div>
       <div class="col-md-6">
-      	<h1 align="center"> MARKETPLACE</h1>
-        <!-- user profile -->
-       <!--  <div class="media">
-          <div class="media-left">
-            <img src= {{data['userdata']['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
-          </div>
-          <div class="media-body">
-            <h2 class="media-heading">{{data['userdata']["username"]}}</h2>
-            <p>Status: {{data['userdata']['bio']}}</p>
-          </div>
-        </div> -->
-        <!-- user profile -->
-
+      	<h1 align="center"> Marketplace</h1>
         <hr>
 
         <!-- timeline -->
@@ -91,6 +77,10 @@
       </div>
       <div class="col-md-3">
         <!-- friends -->
+		<br>
+		<br>
+		<br>
+		<br>
         <div class="panel panel-default">
           <div class="panel-body">
             <h4>Friends</h4>
@@ -106,6 +96,19 @@
           </div>
         </div>
         <!-- ./friends -->
+		<div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Previously Bought</h4>
+            <ul>
+              {% for f in bought %}
+              <li>
+                <h4>{{f[1]}}</h4>
+				Price-{{f[3]}}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </main>

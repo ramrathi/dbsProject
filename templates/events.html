@@ -67,11 +67,11 @@
           <div class="input-group">
             <input class="form-control" type="text" name="description" placeholder="Description...">
             <input class="form-control" type="text" name="location" placeholder="Location">
-			<input class="form-control" type="file" name="media"/>
             <span class="input-group-btn">
               <button class="btn btn-success" type="submit" name="addevent">Post</button>
             </span>
           </div>
+		  <input class="form-control-file" type="file" name="media"/>
         </form><hr>
           <!-- Events -->
           {% for p in data["events"]['events'] %}
@@ -91,7 +91,11 @@
                   	<span class="pull-right"><a href="marksold/{{p[0]}}">{{'[Mark as sold]'}}</a></span>
 
                   	{% else %}
+					{% if [p][0] not in data['events']['user_events'] %}
                   	<span class="pull-right"><a href="Attend/{{[p][0]}}">{{'[Attend]'}}</a></span>
+					{% else %}
+					<span class="pull-right">You Are Attending</span>
+					{% endif %}
                   {% endif %}
                 </div>
               </div>
