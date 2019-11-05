@@ -1,0 +1,17 @@
+insert into Music values (NULL, name, artist,album, year, link);
+
+insert into Music values (NULL, 'Bohemian Rhapsody', 'Queen', 'A night at the opera', 1997, 'tgbNymZ7vqY');
+
+insert into Music values (NULL, 'Jungle Boogie', 'The Electric Mayhem', 'Seasons', 2012, 'h4Bq69HfR0Y');
+
+insert into Music values (NULL, 'Stand By Me', 'Ben E. King','Lalala', 2004, 'zCRUPWDIgYM');
+
+insert into Music values (NULL, 'Ode to Joy', 'Beethoven','Christmas Carols', 2007, 'VnT7pT6zCcA');
+
+
+
+insert into Music values (NULL, 'Kodachrome', 'The Muppets', 'Comedy Central', 2017, '6_01zRwJOPw');
+
+insert into Music values (NULL,'Classical Chicken', 'Gonzo','Gonzo revisited', 2016, 'jd8nfEdo59I');
+
+insert into Music values (NULL, 'The ballad of beaker', 'Beaker','Muppet Classics', 2013, 'EAtBki0PsC0');
