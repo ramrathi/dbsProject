@@ -51,8 +51,8 @@
               {% for f in userdata['requests'] %}
               <li>
                 <a href="#">{{f[1]}}</a>
-                <a class="text-success" href="requests/add/{{f[0]}}">[accept]</a>
-                <a class="text-danger" href="requests/delete/{{f[0]}}">[decline]</a>
+                <a class="text-success" href="../requests/add/{{f[0]}}">[accept]</a>
+                <a class="text-danger" href="../requests/delete/{{f[0]}}">[decline]</a>
               </li>
               {% endfor %}
             </ul>
