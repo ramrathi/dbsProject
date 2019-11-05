@@ -64,22 +64,73 @@ Queries
 "INSERT INTO `dbsproject`.`Market` (`title`,`description`,`price`,`seller`,`sold`) VALUES('%s','%s','%s',%s,0)"%(title,description,price,session['userid'])
 "INSERT INTO `dbsproject`.`Community` (`name`,`description`) VALUES('%s','%s')"%(title,description)
 
-Triggers 
+Triggers
 -----------
-Delimiter # create or replace trigger eventgoing  after insert on Events for each row begin  insert into Attending values (new.e_id, new.host); end#
+Delimiter #
+create or replace trigger eventgoing
+after insert on Events
+for each row
+begin
+insert into Attending values (new.e_id, new.host);
+end#
 
 
-Procedure
+Procedure 1
 -----------
-Delimiter # 
-create or replace procedure walletcheck(in userid INT, in money INT, out result INT) 
-begin 
+Delimiter #
+create or replace procedure walletcheck(in userid INT, in money INT, out result INT)
+begin
 declare currentmoney INT;
 select wallet into currentmoney from Users where id = userid;
 if money > currentmoney then
 	UPDATE Users set wallet = wallet - money where id = userid;
 	INSERT into Payment VALUES(userid,money);
-else 
-    -- Dont insert
-
 end if;
+end#
+
+Procedure 2
+-----------
+Delimiter #
+create or replace procedure transactcheck(in userid1 INT, in money INT, in userid2 INT, in message char)
+begin
+declare currentmoney INT;
+select wallet into currentmoney from Users where id = userid1;
+if money < currentmoney then
+UPDATE Users set wallet = wallet - money where id = userid1;
+UPDATE Users set wallet = wallet + money where id = userid2;
+INSERT into Transactions(`from`, `to`, `money`, `timestamp`, `message`) VALUES (userid1, userid2, money, CURTIME(), message);
+end if;
+end#
+
+Cursors
+-------
+Delimiter #
+CREATE OR REPLACE PROCEDURE curdemo(IN id int, OUT nam varchar(20) ,OUT descp varchar(20))
+BEGIN
+  DECLARE f,g CHAR(16);
+  DECLARE h INT;
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur3 CURSOR FOR SELECT c_id FROM Community;
+  DECLARE cur1 CURSOR FOR SELECT name FROM Community;
+  DECLARE cur2 CURSOR FOR SELECT description FROM Community;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  OPEN cur1;
+  OPEN cur2;
+  OPEN cur3;
+
+  read_loop: LOOP
+  	FETCH cur1 INTO f;
+    FETCH cur2 INTO g;
+	FETCH cur3 INTO h;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+	IF h = id THEN
+	SET nam = f;
+	SET descp = g;
+	END IF;
+  END LOOP;
+  CLOSE cur1;
+  CLOSE cur2;
+END#

@@ -17,7 +17,7 @@ mydb = mysql.connector.connect(
 
 cursor = mydb.cursor()
 app = Flask(__name__)
-app.secret_key = "fuck off"
+app.secret_key = "thisisatopsecretkey"
 
 def auth(page):
 	# Session url holds the last visited link by the user
@@ -38,13 +38,17 @@ def refreshcookies():
 	session['picture'] = data[0][11]
 
 def getcommunity(comm,id):
-	sql = "select * from Community where c_id = "+id
+	sql = "call curdemo('%s',@a,@b)"%(id)
 	cursor.execute(sql)
-	c = cursor.fetchall()
-	comm['id'] = c[0][0]
-	comm['name'] = c[0][1]
-	comm['description'] = c[0][2]
-
+	sql2 = "select @a"
+	cursor.execute(sql2)
+	a=cursor.fetchall()
+	sql3 = "select @b"
+	cursor.execute(sql3)
+	b=cursor.fetchall()
+	comm['id'] = id
+	comm['name'] = a[0][0]
+	comm['description'] = b[0][0]
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
@@ -303,8 +307,10 @@ def market():
 		sql2 = "Select * from Market,Payment,Users where id=user_id and item_id=i_id and user_id='%s';"%(session['userid'])
 		cursor.execute(sql2)
 		bought = cursor.fetchall()
-		print(data['userdata']['userid'] == data['items'][-1][5])
-		return render_template('market.html',data=data, bought=bought)
+		sql3 = "select wallet from Users where id='%s';"%(session['userid'])
+		cursor.execute(sql3)
+		wallet = cursor.fetchall()[0][0]
+		return render_template('market.html',data=data, bought=bought, wallet = wallet)
 
 
 @app.route('/marksold/<string:id>', methods=['GET'])
@@ -321,12 +327,12 @@ def buy(id):
 	# wallet value in Users goes negative then reset the sold
 	# and wallet. Basically don't sell it then
 
-	sql = 'UPDATE Market set sold= 1 where i_id = %s'%(id)
-	sql2 = 'UPDATE Users set wallet = wallet - (select price from Market where i_id = %s) where id = %s'%(id,session['userid'])
-	sql3 = "INSERT into Payment VALUES('%s','%s');"%(session['userid'],id)
+	sql = "select price from Market where i_id = %s"%(id)
 	cursor.execute(sql)
+	money = cursor.fetchall()[0][0]
+	print(money)
+	sql2 = "call walletcheck('%s','%s','%s');"%(session['userid'],money,id)
 	cursor.execute(sql2)
-	cursor.execute(sql3)
 	mydb.commit()
 	return redirect('/market')
 
@@ -403,12 +409,8 @@ def transaction():
 		f_id = request.form["friends"]
 		amount = request.form["amount"]
 		message = request.form["message"]
-		sql = 'UPDATE Users set wallet = wallet-%s where id = %s'%(amount,session['userid'])
-		sql2 = 'UPDATE Users set wallet = wallet + %s where id = %s'%(amount,f_id)
-		sql3 = "INSERT INTO `dbsproject`.`Transactions` (`from`, `to`, `money`, `timestamp`, `message`) VALUES ('%s', '%s', '%s', CURTIME(), '%s');"%(session['userid'],f_id,amount,message)
+		sql = "call transactcheck('%s','%s','%s','%s');"%(session['userid'],amount,f_id,message)
 		cursor.execute(sql)
-		cursor.execute(sql2)
-		cursor.execute(sql3)
 		mydb.commit()
 		return redirect("/transaction")
 
