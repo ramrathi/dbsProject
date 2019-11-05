@@ -48,7 +48,7 @@ def getcommunity(comm,id):
 
 def getfriendsposts(userdata):
 	# Sorry for using cartesian products
-	sql = 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
+	sql = 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where u_id = id and community is null and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
 	cursor.execute(sql)
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
@@ -597,4 +597,4 @@ def addcommunity():
 	return redirect('/community')
 
 if __name__ == "__main__":
-	app.run(port=3000, debug=True)
+	app.run(port=3000, debug=False)
