@@ -103,9 +103,9 @@ end#
 Cursors
 -------
 Delimiter #
-CREATE OR REPLACE PROCEDURE curdemo(IN id int, OUT nam varchar(20) ,OUT descp varchar(20))
+CREATE OR REPLACE PROCEDURE curdemo(IN id int, OUT nam varchar(20) ,OUT descp varchar(255))
 BEGIN
-  DECLARE f,g CHAR(16);
+  DECLARE f,g VARCHAR(255);
   DECLARE h INT;
   DECLARE done INT DEFAULT FALSE;
   DECLARE cur3 CURSOR FOR SELECT c_id FROM Community;
