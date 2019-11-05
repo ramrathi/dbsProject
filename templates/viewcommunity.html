@@ -30,41 +30,44 @@
   <main class="container">
     <div class="row">
 		<div class="col-md-3">
-          <!-- profile brief -->
-           <div class="media">
-            <div class="media-left">
-              <img src= {{userdata['profile_picture']}} class="media-object" style="width: 128px; height: 128px;">
+          <!-- edit profile -->
+          <br><br><br>
+		  <h4><center>Add a Community</center></h4>
+  		<form method="post" action="addcommunity" enctype="multipart/form-data">
+            <div class="input-group">
+              <input class="form-control" type="text" name="title" placeholder="Name of Your Community">
+              <input class="form-control" type="text" name="description" placeholder="Enter Description">
             </div>
-            <div class="media-body">
-            </div>
-            <br>
-          </div>
-              <h2 class="media-heading">{{userdata["username"]}}</h2>
-              <p>Status: {{userdata['bio']}}</p>
+                <button class="btn btn-success" type="submit" name="post">Post</button>
+          </form><hr>
+          <!-- ./edit profile -->
         </div>
 
       <div class="col-md-6">
-        <h1 align="center">Join A Community</h1>
-              <div class="panel panel-default">
-                <div class="panel-body">
-					<center>
+        <h1 align="center">Join a Community</h1>
           {% for g in groups %}
+		  <div class="panel panel-default">
+			<div class="panel-body">
+				<center>
                   <h3>{{g[1]}}</h3>
                   <p>{{g[2]}}</p>
                 <div>
-
                     <a href = "../groups/{{g[0]}}">
                   <button class="btn btn-success" type="submit" name="enter">Enter</button>
                   </a>
-          {% endfor %}
               </div>
 		  </center>
           <!-- ./Events -->
         </div>
         <!-- ./timeline -->
       </div>
+	  {% endfor %}
   </div>
       <div class="col-md-3">
+		  <br>
+		  <br>
+		  <br>
+		  <br>
 		  <div class="panel panel-default">
             <div class="panel-body">
               <h4>Your Communities</h4>

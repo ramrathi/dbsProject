@@ -303,8 +303,11 @@ def market():
 		data['userdata'] = {}
 		getuserdata(data['userdata'])
 		getuserfriends(data['userdata'])
+		sql2 = "Select * from Market,Payment,Users where id=user_id and item_id=i_id and user_id='%s';"%(session['userid'])
+		cursor.execute(sql2)
+		bought = cursor.fetchall()
 		print(data['userdata']['userid'] == data['items'][-1][5])
-		return render_template('market.html',data=data)
+		return render_template('market.html',data=data, bought=bought)
 
 
 @app.route('/marksold/<string:id>', methods=['GET'])
@@ -323,8 +326,10 @@ def buy(id):
 
 	sql = 'UPDATE Market set sold= 1 where i_id = %s'%(id)
 	sql2 = 'UPDATE Users set wallet = wallet - (select price from Market where i_id = %s) where id = %s'%(id,session['userid'])
+	sql3 = "INSERT into Payment VALUES('%s','%s');"%(session['userid'],id)
 	cursor.execute(sql)
 	cursor.execute(sql2)
+	cursor.execute(sql3)
 	mydb.commit()
 	return redirect('/market')
 
@@ -585,6 +590,14 @@ def addmarketitem():
 	mydb.commit()
 	return redirect('/market')
 
+@app.route('/addcommunity', methods=['POST'])
+def addcommunity():
+	title = request.form['title']
+	description= request.form['description']
+	sql = "INSERT INTO `dbsproject`.`Community` (`name`,`description`) VALUES('%s','%s')"%(title,description)
+	cursor.execute(sql)
+	mydb.commit()
+	return redirect('/community')
 
 if __name__ == "__main__":
 	app.run(port=3000, debug=True)
