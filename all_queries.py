@@ -78,20 +78,18 @@ end#
 Procedure 1
 -----------
 Delimiter #
-create or replace procedure walletcheck(in userid INT, in money INT, out result INT)
-begin
-declare currentmoney INT;
+create or replace procedure walletcheck(in userid INT, in money INT, in item INT)
+begin declare currentmoney INT;
 select wallet into currentmoney from Users where id = userid;
-if money > currentmoney then
-	UPDATE Users set wallet = wallet - money where id = userid;
-	INSERT into Payment VALUES(userid,money);
+if money < currentmoney then UPDATE Users set wallet = wallet - money where id = userid;
+INSERT into Payment VALUES(userid,item); UPDATE Market set sold = 1 where i_id = item;
 end if;
 end#
 
 Procedure 2
 -----------
 Delimiter #
-create or replace procedure transactcheck(in userid1 INT, in money INT, in userid2 INT, in message char)
+create or replace procedure transactcheck(in userid1 INT, in money INT, in userid2 INT, in message varchar(50))
 begin
 declare currentmoney INT;
 select wallet into currentmoney from Users where id = userid1;

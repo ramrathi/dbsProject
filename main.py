@@ -323,10 +323,6 @@ def marksold(id):
 @app.route('/buy/<string:id>', methods=['GET'])
 def buy(id):
 
-	# Opportunity to put a trigger or something, if the
-	# wallet value in Users goes negative then reset the sold
-	# and wallet. Basically don't sell it then
-
 	sql = "select price from Market where i_id = %s"%(id)
 	cursor.execute(sql)
 	money = cursor.fetchall()[0][0]
@@ -599,4 +595,4 @@ def addcommunity():
 	return redirect('/community')
 
 if __name__ == "__main__":
-	app.run(port=3000, debug=False)
+	app.run(port=3000, debug=True)
