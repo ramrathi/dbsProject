@@ -68,7 +68,7 @@ def getcommunityposts(userdata,id):
 	posts = cursor.fetchall()
 	posts = posts[::-1]	# Newest posts come first
 	userdata['posts'] = posts
-	sql = 'select comm_id,post_id, name,content,timestamp from Comments join Users on Users.id = Comments.user_id'
+	sql = 'select comm_id,post_id, name,content,timestamp,Users.id from Comments join Users on Users.id = Comments.user_id'
 	cursor.execute(sql)
 	comments = cursor.fetchall()
 	userdata['comments'] = comments
