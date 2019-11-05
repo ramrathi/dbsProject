@@ -466,6 +466,7 @@ def viewcommunity():
 @app.route('/groups/<string:id>', methods=['GET','POST'])
 def groups(id):
 	if request.method =='GET':
+		if not auth('/groups/%s'%(id)): redirect('/login')
 		sql = 'Select * from Belongs,Users where community_id='+id+' and user_id=id;'
 		cursor.execute(sql)
 		users = cursor.fetchall()
