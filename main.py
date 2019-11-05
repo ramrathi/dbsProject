@@ -382,12 +382,12 @@ def comment(action,id):
 		sql = "insert into Comments values (NULL,'%s','%s','%s',NULL)"%(id,session['userid'],comment_content)
 		cursor.execute(sql)
 		mydb.commit()
-		return redirect('/')
+		return redirect(session['url'])
 	else:
 		sql = "delete from Comments where comm_id = %s"%(id)
 		cursor.execute(sql)
 		mydb.commit()
-		return redirect('/')
+		return redirect(session['url'])
 
 
 @app.route('/transaction', methods=['POST','GET'])
