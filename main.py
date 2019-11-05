@@ -209,7 +209,7 @@ def register():
 		dob = '1999-05-27'
 		gender = 1
 		# The wallet is being set to random as for some reason wallet is unique? someone change this lmao
-		wallet = random.randrange(0,100000)
+		wallet = 1000
 		sql = "select * from Users where email = '%s';"%email
 		cursor.execute(sql)
 		data = cursor.fetchall()

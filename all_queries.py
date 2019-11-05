@@ -1,3 +1,5 @@
+Queries
+--------
 "select * from Users where id = '%s';"%(session['userid'])
 "select * from Community where c_id = "+id
 'select name,content,time_stamp,p_id,photosrc,p_id from Users,Posts where u_id = id and (u_id in (select u2_id from Friends where u1_id =%s) or u_id = %s)'%(session["userid"],session["userid"])
@@ -30,8 +32,6 @@
 "Select * from Market,Payment,Users where id=user_id and item_id=i_id and user_id='%s';"%(session['userid'])
 'UPDATE Market set sold= 1 where i_id = %s'%(id)
 'UPDATE Market set sold= 1 where i_id = %s'%(id)
-'UPDATE Users set wallet = wallet - (select price from Market where i_id = %s) where id = %s'%(id,session['userid'])
-"INSERT into Payment VALUES('%s','%s');"%(session['userid'],id)
 "insert into Friends values (%s,%s)"%(id,session['userid'])
 "insert into Friends values (%s,%s)"%(session['userid'],id)
 "delete from Requests where u_id1 = %s"%(id)
@@ -63,3 +63,23 @@
 "INSERT INTO `dbsproject`.`Market` (`title`,`description`,`price`,`seller`,`sold`) VALUES('%s','%s','%s',%s,0)"%(title,description,price,session['userid'])
 "INSERT INTO `dbsproject`.`Market` (`title`,`description`,`price`,`seller`,`sold`) VALUES('%s','%s','%s',%s,0)"%(title,description,price,session['userid'])
 "INSERT INTO `dbsproject`.`Community` (`name`,`description`) VALUES('%s','%s')"%(title,description)
+
+Triggers 
+-----------
+Delimiter # create or replace trigger eventgoing  after insert on Events for each row begin  insert into Attending values (new.e_id, new.host); end#
+
+
+Procedure
+-----------
+Delimiter # 
+create or replace procedure walletcheck(in userid INT, in money INT, out result INT) 
+begin 
+declare currentmoney INT;
+select wallet into currentmoney from Users where id = userid;
+if money > currentmoney then
+	UPDATE Users set wallet = wallet - money where id = userid;
+	INSERT into Payment VALUES(userid,money);
+else 
+    -- Dont insert
+
+end if;
