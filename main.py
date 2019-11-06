@@ -403,7 +403,7 @@ def transaction():
 	else:
 		if not auth("/transaction"): return redirect('/login')
 		f_id = request.form["friends"]
-		amount = request.form["amount"]
+		amount = abs(int(request.form["amount"]))
 		message = request.form["message"]
 		sql = "call transactcheck('%s','%s','%s','%s');"%(session['userid'],amount,f_id,message)
 		cursor.execute(sql)
