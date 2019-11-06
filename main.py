@@ -339,7 +339,7 @@ def requests(choice,id):
 		cursor.execute(sql)
 		sql = "insert into Friends values (%s,%s)"%(session['userid'],id)
 		cursor.execute(sql)
-	sql = "delete from Requests where u_id1 = %s"%(id)
+	sql = "delete from Requests where u_id1 = %s and u_id2 = %s"%(id,session['userid'])
 	cursor.execute(sql)
 	mydb.commit()
 	return redirect(session['url'])
