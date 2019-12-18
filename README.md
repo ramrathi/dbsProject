@@ -5,7 +5,7 @@
   pip install -r requirements.txt
 
 ## Create the database:
-  mysql -u username -p < ./Extra_files/enti\(tit\)y_mysql_create.sql
+  mysql -u username -p < ./Extra_files/enti\tity_mysql_create.sql
 
 ## Create .env in the same directory and add
 1. localhost='localhost'
